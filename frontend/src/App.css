@@ -1,0 +1,51 @@
+/* Base App styles */
+.App {
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive container */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* Example for header responsiveness */
+.App-header {
+  background-color: #282c34;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  color: white;
+}
+
+/* Mobile-first responsiveness */
+@media (max-width: 768px) {
+  .App-header {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .container {
+    padding: 0 10px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .App-header {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .container {
+    padding: 0 6px;
+  }
+}
