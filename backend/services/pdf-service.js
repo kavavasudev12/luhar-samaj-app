@@ -37,10 +37,10 @@ function fitText(doc, text, font, color, initialSize, x1, y1, x2, y2, align = 'l
   }
 
   const textHeight = fontSize;
-  
+
   // Calculate vertical center
   const textY = y1 + (boxHeight - textHeight) / 2;
-  
+
   // Always start at the left edge (x1)
   const textX = x1;
 
@@ -48,7 +48,7 @@ function fitText(doc, text, font, color, initialSize, x1, y1, x2, y2, align = 'l
   doc.text(text, textX, textY, {
     width: boxWidth,
     height: boxHeight,
-    align: align 
+    align: align
   });
 }
 
@@ -66,6 +66,10 @@ async function generateCard(memberId) {
       throw new Error("Gujarati fonts not found in assets/fonts/ — add NotoSansGujarati-Regular.ttf & Bold.ttf");
     }
 
+    // --- BORDER CONFIG ---
+    // Uniform white border (in points) added around the entire card.
+    const BORDER = 10;
+
     // --- NEW DIMENSIONS & SCALING ---
     // 1 inch = 72 points (pdfkit's default unit)
     const newWidth = 3.37 * 72; // 242.64 pt
@@ -73,60 +77,79 @@ async function generateCard(memberId) {
     const oldWidth = 900;
     const oldHeight = 1200;
 
+    // Page dimensions including the border on all four sides
+    const pageWidth = newWidth + BORDER * 2;
+    const pageHeight = newHeight + BORDER * 2;
+
     // Scaling functions to convert old coordinates to new coordinates
+    // (UNCHANGED — these remain pure scale factors. They are still used directly
+    // wherever a value represents a WIDTH or HEIGHT rather than an absolute position,
+    // e.g. `width: sx(680)`, so those box sizes are not affected by the border.)
     const sx = (val) => (val / oldWidth) * newWidth;   // Scale X coordinates and widths
     const sy = (val) => (val / oldHeight) * newHeight; // Scale Y coordinates and heights
     const sFont = (val) => sy(val); // Scale font sizes (as they are heights)
     // Use 'sy' for square items to fit vertically (it's the smaller factor)
-    const sSquare = (val) => sy(val); 
+    const sSquare = (val) => sy(val);
     // --- END NEW ---
 
-    const doc = new PDFDocument({ size: [newWidth, newHeight], margin: 0 });
+    // --- POSITION HELPERS (NEW) ---
+    // Same scaling as sx/sy, but offset by BORDER. Use these ONLY for absolute
+    // X/Y drawing coordinates (image positions, text origins, box corners),
+    // never for standalone width/height values — that keeps every box size
+    // identical while shifting all content uniformly by the border amount.
+    const px = (val) => BORDER + sx(val);
+    const py = (val) => BORDER + sy(val);
+    // --- END NEW ---
+
+    const doc = new PDFDocument({ size: [pageWidth, pageHeight], margin: 0 });
     const buffers = [];
     doc.on('data', buffers.push.bind(buffers));
 
     doc.registerFont('regular', fontRegular);
     doc.registerFont('bold', fontBold);
-    
-    // Scale template image to fit new dimensions
-    doc.image(templatePath, 0, 0, { width: newWidth, height: newHeight });
-    
+
+    // Explicit white background covering the full page (including the border area)
+    doc.rect(0, 0, pageWidth, pageHeight).fill('white');
+
+    // Scale template image to fit new dimensions, offset by the border
+    doc.image(templatePath, BORDER, BORDER, { width: newWidth, height: newHeight });
+
     const stampSize = sSquare(270);
-    doc.opacity(0.2).image(stampPath, sx(310), sy(250), { width: stampSize, height: stampSize }).opacity(1);
-    doc.opacity(0.2).image(stampPath, sx(310), sy(750), { width: stampSize, height: stampSize }).opacity(1);
+    doc.opacity(0.2).image(stampPath, px(310), py(250), { width: stampSize, height: stampSize }).opacity(1);
+    doc.opacity(0.2).image(stampPath, px(310), py(750), { width: stampSize, height: stampSize }).opacity(1);
 
     const baseUrl = process.env.BASE_URL || "http://localhost:5000";
     const qrData = `${baseUrl}/api/members/verify/${member.cardId || member._id}`;
     const qrImageBuffer = await QRCode.toBuffer(qrData, { width: 165, margin: 1 });
     const qrDrawSize = sSquare(165);
-    doc.image(qrImageBuffer, sx(710), sy(250), { width: qrDrawSize, height: qrDrawSize });
+    doc.image(qrImageBuffer, px(710), py(250), { width: qrDrawSize, height: qrDrawSize });
 
     const registrationYear = member.createdAt ? new Date(member.createdAt).getFullYear() : '';
-    doc.font('bold').fontSize(sFont(35)).fillColor('white').text(registrationYear, sx(780), sy(25));
+    doc.font('bold').fontSize(sFont(35)).fillColor('white').text(registrationYear, px(780), py(25));
 
     // --- MODIFICATION START ---
     // Print Unique Number and Zone in individual, fixed-position boxes
-    
+
     // 1. Unique Number (Red)
     // This part is placed in a box from x=650 to x=795 and is right-aligned.
-    
-    const uniquePart = `${member.uniqueNumber || member.cardId || '---'}`; 
-    
+
+    const uniquePart = `${member.uniqueNumber || member.cardId || '---'}`;
+
     fitText(doc, uniquePart, 'bold', 'red',
       sFont(36),      // initialSize
-      sx(685), sy(465), // x1, y1
-      sx(795), sy(535), // x2, y2 (This is 650 + 145)
+      px(685), py(465), // x1, y1
+      px(795), py(535), // x2, y2 (This is 650 + 145)
       'center'          // align: right-align to meet the zone number
     );
 
     // 2. Zone Number (Blue)
     // This part is placed in a box from x=795 to x=885 and is left-aligned.
-    const zonePart = `${member.zone?.number || ''}`; 
-    
+    const zonePart = `${member.zone?.number || ''}`;
+
     fitText(doc, zonePart, 'bold', 'blue',
       sFont(36),      // initialSize
-      sx(825), sy(465), // x1, y1 (Starts where the uniquePart box ends)
-      sx(885), sy(535), // x2, y2 (Original end of the area)
+      px(825), py(465), // x1, y1 (Starts where the uniquePart box ends)
+      px(885), py(535), // x2, y2 (Original end of the area)
       'center'          // align: left-align to meet the unique number
     );
     // --- MODIFICATION END ---
@@ -134,69 +157,69 @@ async function generateCard(memberId) {
     let headFontSize = 55;
     if (!isGujarati(member.head?.name)) headFontSize -= 10;
     // Pass scaled values to fitText
-    fitText(doc, member.head?.name || '', 'bold', 'red', 
+    fitText(doc, member.head?.name || '', 'bold', 'red',
       sFont(headFontSize), // initialSize
-      sx(38), sy(230),     // x1, y1
-      sx(738), sy(300),     // x2, y2
+      px(38), py(230),     // x1, y1
+      px(738), py(300),     // x2, y2
       'left'               // align
     );
 
     let addressFontSize = 26;
     if (!isGujarati(member.address)) addressFontSize -= 6;
-    doc.font('regular').fontSize(sFont(addressFontSize)).fillColor('blue').text(member.address || '', sx(38), sy(315), { 
-        width: sx(680), 
-        height: sy(160), // Use 120, this is correct
-        ellipsis: true, 
-        align: 'left' 
+    doc.font('regular').fontSize(sFont(addressFontSize)).fillColor('blue').text(member.address || '', px(38), py(315), {
+      width: sx(680),
+      height: sy(160), // Use 120, this is correct
+      ellipsis: true,
+      align: 'left'
     });
 
     // ...
     const city = member.city || '';
     const pincode = member.pincode || '';
-    const cityPincode = [city, pincode].filter(Boolean).join(' - '); 
+    const cityPincode = [city, pincode].filter(Boolean).join(' - ');
 
-    doc.font('bold').fontSize(sFont(35)).fillColor('red').text(cityPincode, sx(38), sy(450), { width: sx(700) });
-    
-    doc.font('bold').fontSize(sFont(40)).fillColor('blue').text(`મો. : ${member.mobile || ''}`, sx(38), sy(491), { width: sx(800) });
+    doc.font('bold').fontSize(sFont(35)).fillColor('red').text(cityPincode, px(38), py(450), { width: sx(700) });
+
+    doc.font('bold').fontSize(sFont(40)).fillColor('blue').text(`મો. : ${member.mobile || ''}`, px(38), py(491), { width: sx(800) });
 
     const family = member.familyMembers || [];
     for (let i = 0; i < Math.min(family.length, 8); i++) {
-      const yPos = sy(685) + (i * sFont(50));
+      const yPos = py(685) + (i * sFont(50));
       const famMember = family[i];
 
       if (!famMember) continue;
 
       let famFontSize = 35;
       if (!isGujarati(famMember.name) || !isGujarati(famMember.relation)) famFontSize -= 6;
-      
-      doc.font('regular').fontSize(sFont(famFontSize)).fillColor('purple').text(`${i + 1}    ${famMember.name}`, sx(25), yPos, { width: sx(600), ellipsis: true });
-      
+
+      doc.font('regular').fontSize(sFont(famFontSize)).fillColor('purple').text(`${i + 1}    ${famMember.name}`, px(25), yPos, { width: sx(600), ellipsis: true });
+
       // --- MODIFICATION START: Split Relation and Age (Centered) ---
       // Relation: x=630 to x=730
-      const relationX = sx(630);
-      const relationWidth = sx(730) - relationX; 
-      
+      const relationX = px(630);
+      const relationWidth = px(730) - relationX;
+
       // Age: x=740 to x=780
-      const ageX = sx(740);
-      const ageWidth = sx(810) - ageX;
+      const ageX = px(740);
+      const ageWidth = px(810) - ageX;
 
       // Set font style once for both
       doc.font('regular').fontSize(sFont(famFontSize)).fillColor('purple');
 
       // 1. Print Relation (Centered)
       const relationText = famMember.relation || '';
-      doc.text(relationText, relationX, yPos, { 
-          width: relationWidth, 
-          align: 'center',
-          ellipsis: true 
+      doc.text(relationText, relationX, yPos, {
+        width: relationWidth,
+        align: 'center',
+        ellipsis: true
       });
 
       // 2. Print Age (Centered)
       const ageText = famMember.age ? `${famMember.age}` : '';
-      doc.text(ageText, ageX, yPos, { 
-          width: ageWidth, 
-          align: 'center',
-          ellipsis: true 
+      doc.text(ageText, ageX, yPos, {
+        width: ageWidth,
+        align: 'center',
+        ellipsis: true
       });
       // --- MODIFICATION END ---
     }
@@ -204,8 +227,8 @@ async function generateCard(memberId) {
     // --- MODIFICATION START: Vertical Issue Date (Reads Top-to-Bottom When Card is Rotated) ---
     const issueDateFormatted = new Date(member.issueDate).toLocaleDateString('en-GB');
     const issueDateText = `Date of Issue: ${issueDateFormatted}`;
-    const issueDateX = sx(850); // X coordinate
-    const issueDateY = sy(1070); // Y coordinate (adjusted to start higher)
+    const issueDateX = px(835); // X coordinate
+    const issueDateY = py(1070); // Y coordinate (adjusted to start higher)
 
     doc.save(); // Save the state
 
@@ -214,7 +237,7 @@ async function generateCard(memberId) {
     // Translate to the starting position, then rotate -90 degrees
     doc.translate(issueDateX, issueDateY);
     doc.rotate(-90);
-    
+
     // Draw the text at origin (0, 0) after transformation
     doc.text(issueDateText, 0, 0);
 
@@ -223,8 +246,8 @@ async function generateCard(memberId) {
 
     doc.end();
     return new Promise((resolve, reject) => {
-        doc.on('end', () => resolve(Buffer.concat(buffers)));
-        doc.on('error', reject);
+      doc.on('end', () => resolve(Buffer.concat(buffers)));
+      doc.on('error', reject);
     });
   } catch (error) {
     console.error('PDF generation error:', error);
@@ -273,13 +296,13 @@ async function generateZoneStickers(members) {
       const textWidth = stickerWidth - (textPadding * 2);
       doc.rect(currentX, currentY, stickerWidth, stickerHeight).stroke();
       doc.font('bold').fontSize(12).text(member.head.name, currentX + textPadding, currentY + textPadding, { width: textWidth });
-      
+
       // Combine address, city, pincode for sticker
       const cityPincode = [member.city, member.pincode].filter(Boolean).join(' - ');
       const fullAddress = [member.address, cityPincode].filter(Boolean).join(', ');
-      
+
       doc.font('regular').fontSize(9).text(fullAddress, doc.x, doc.y, { width: textWidth, ellipsis: true });
-      
+
       const zoneText = `Zone: ${member.zone.number} - ${member.zone.name}`;
       // Position zone text at the bottom of the sticker
       doc.font('regular').fontSize(8).text(zoneText, currentX + textPadding, currentY + stickerHeight - 15, { width: textWidth });
@@ -289,8 +312,8 @@ async function generateZoneStickers(members) {
 
     doc.end();
     return new Promise((resolve, reject) => {
-        doc.on('end', () => resolve(Buffer.concat(buffers)));
-        doc.on('error', reject);
+      doc.on('end', () => resolve(Buffer.concat(buffers)));
+      doc.on('error', reject);
     });
   } catch (error) {
     console.error('Sticker sheet generation error:', error);
