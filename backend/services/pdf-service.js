@@ -122,7 +122,7 @@ async function generateCard(memberId) {
     const verificationUrl = `https://luhar-gyati-samaj-sk.onrender.com/api/members/verify/${verificationToken}`;
     const qrImageBuffer = await QRCode.toBuffer(verificationUrl, { width: 165, margin: 1 });
     const qrDrawSize = sSquare(165);
-    doc.image(qrImageBuffer, px(710), py(250), { width: qrDrawSize, height: qrDrawSize });
+    doc.image(qrImageBuffer, px(715), py(250), { width: qrDrawSize, height: qrDrawSize });
 
     // const registrationYear = member.createdAt ? new Date(member.createdAt).getFullYear() : '';
     //  doc.font('bold').fontSize(sFont(35)).fillColor('white').text(registrationYear, px(780), py(25));
@@ -154,8 +154,8 @@ async function generateCard(memberId) {
     );
     // --- MODIFICATION END ---
 
-    let headFontSize = 55;
-    if (!isGujarati(member.head?.name)) headFontSize -= 10;
+    let headFontSize = 50;
+    if (!isGujarati(member.head?.name)) headFontSize -= 15;
     // Pass scaled values to fitText
     fitText(doc, member.head?.name || '', 'bold', 'red',
       sFont(headFontSize), // initialSize
@@ -165,7 +165,7 @@ async function generateCard(memberId) {
     );
 
     let addressFontSize = 26;
-    if (!isGujarati(member.address)) addressFontSize -= 6;
+    if (!isGujarati(member.address)) addressFontSize -= 2;
     doc.font('regular').fontSize(sFont(addressFontSize)).fillColor('blue').text(member.address || '', px(38), py(315), {
       width: sx(680),
       height: sy(160), // Use 120, this is correct
