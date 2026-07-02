@@ -1,23 +1,21 @@
 import React, { useState } from 'react';
-import { 
-  Box, Drawer, AppBar, Toolbar, List, Typography, Divider, IconButton, 
+import {
+  Box, Drawer, AppBar, Toolbar, List, Typography, Divider, IconButton,
   ListItem, ListItemButton, ListItemIcon, ListItemText, Avatar, Menu, MenuItem,
-  InputBase, Badge, Tooltip, useTheme
+  InputBase, Badge, Tooltip
 } from '@mui/material';
-import { 
-  Menu as MenuIcon, 
-  Dashboard as DashboardIcon, 
-  People as PeopleIcon, 
+import {
+  Menu as MenuIcon,
+  Dashboard as DashboardIcon,
+  People as PeopleIcon,
   GroupAdd as GroupAddIcon,
-  Map as MapIcon, 
+  Map as MapIcon,
   Notifications as NotificationsIcon,
-  Search as SearchIcon, 
-  Brightness4 as DarkModeIcon, 
+  Search as SearchIcon,
+  Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
   Logout as LogoutIcon,
-  Settings as SettingsIcon,
   Assignment as AuditIcon,
-  BarChart as ReportsIcon,
   Rule as RequestsIcon,
   Delete as DeleteIcon
 } from '@mui/icons-material';
@@ -26,7 +24,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 const drawerWidth = 260;
 
 export default function AdminLayout({ children, toggleColorMode, mode }) {
-  const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -74,11 +71,12 @@ export default function AdminLayout({ children, toggleColorMode, mode }) {
           const isSelected = location.pathname === item.path;
           return (
             <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
-              <ListItemButton 
-                component={Link} 
+              <ListItemButton
+                component={Link}
                 to={item.path}
                 selected={isSelected}
-                sx={{ 
+                onClick={() => setMobileOpen(false)}
+                sx={{
                   borderRadius: 2,
                   '&.Mui-selected': {
                     bgcolor: 'primary.light',
@@ -104,7 +102,7 @@ export default function AdminLayout({ children, toggleColorMode, mode }) {
       <Divider />
       <List sx={{ px: 1, py: 1 }}>
         <ListItem disablePadding>
-          <ListItemButton 
+          <ListItemButton
             onClick={handleLogout}
             sx={{ borderRadius: 2, color: 'error.main', '&:hover': { bgcolor: 'error.light', color: 'error.contrastText', '& .MuiListItemIcon-root': { color: 'error.contrastText' } } }}
           >
@@ -121,10 +119,10 @@ export default function AdminLayout({ children, toggleColorMode, mode }) {
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
       {/* AppBar / Topbar */}
-      <AppBar 
-        position="fixed" 
-        sx={{ 
-          width: { md: `calc(100% - ${drawerWidth}px)` }, 
+      <AppBar
+        position="fixed"
+        sx={{
+          width: { md: `calc(100% - ${drawerWidth}px)` },
           ml: { md: `${drawerWidth}px` },
           boxShadow: 1,
           bgcolor: 'background.paper',
@@ -145,18 +143,18 @@ export default function AdminLayout({ children, toggleColorMode, mode }) {
           </IconButton>
 
           {/* Search bar */}
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            bgcolor: 'action.selected', 
-            px: 2, 
-            py: 0.5, 
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            bgcolor: 'action.selected',
+            px: 2,
+            py: 0.5,
             borderRadius: 2,
             width: { xs: '120px', sm: '250px' }
           }}>
             <SearchIcon sx={{ color: 'text.secondary', mr: 1, fontSize: 20 }} />
-            <InputBase 
-              placeholder="શોધો..." 
+            <InputBase
+              placeholder="શોધો..."
               sx={{ fontSize: '0.875rem', width: '100%' }}
             />
           </Box>
@@ -185,7 +183,7 @@ export default function AdminLayout({ children, toggleColorMode, mode }) {
                 </Avatar>
               </IconButton>
             </Tooltip>
-            
+
             <Menu
               anchorEl={profileAnchor}
               open={Boolean(profileAnchor)}
@@ -228,11 +226,11 @@ export default function AdminLayout({ children, toggleColorMode, mode }) {
       </Box>
 
       {/* Content Area */}
-      <Box 
-        component="main" 
-        sx={{ 
-          flexGrow: 1, 
-          p: 3, 
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
           width: { md: `calc(100% - ${drawerWidth}px)` },
           mt: '64px',
           minHeight: 'calc(100vh - 64px)'

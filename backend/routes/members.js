@@ -75,8 +75,8 @@ function normalizeFamilyMembers(input) {
           : (typeof f.age === "number"
             ? f.age
             : typeof f.age === "string" && f.age.trim() !== "" && !isNaN(Number(f.age))
-            ? Number(f.age)
-            : undefined);
+              ? Number(f.age)
+              : undefined);
       const gender =
         f.gender && ["male", "female", "other"].includes(String(f.gender).toLowerCase())
           ? String(f.gender).toLowerCase()
@@ -547,7 +547,7 @@ router.put("/:id", auth, async (req, res) => {
       if (!zoneDoc) return res.status(400).json({ error: "Invalid zone ID" });
       updateData.zone = zone;
     }
-    
+
     if (familyMembers !== undefined) {
       updateData.familyMembers = normalizeFamilyMembers(familyMembers);
     }
@@ -792,83 +792,58 @@ router.get("/verify/:id", async (req, res) => {
     const { id } = req.params;
     let queryParts = [];
 
-    const baseQuery = { isDeleted: { $ne: true } };
-
     if (!isNaN(parseInt(id, 10))) {
-      queryParts.push({ uniqueNumber: parseInt(id, 10), ...baseQuery });
+      queryParts.push({ uniqueNumber: parseInt(id, 10) });
     }
     if (mongoose.Types.ObjectId.isValid(id)) {
-      queryParts.push({ _id: id, ...baseQuery });
+      queryParts.push({ _id: id });
     }
 
     if (queryParts.length === 0) {
-      const errorData = { valid: false, message: "Invalid identifier provided." };
-      if (req.accepts("html")) {
-        const body = `<div class="card error"><h2>અમાન્ય આઈડી</h2><p>તમે અમાન્ય આઈડી પ્રદાન કર્યું છે.</p></div>`;
-        return sendHtmlResponse(res, 400, "અમાન્ય આઈડી", body);
-      } else {
-        return res.status(400).json(errorData);
-      }
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const member = await Member.findOne({
-      $or: queryParts, // Find by ID or UniqueNumber (and isNotDeleted)
-      membershipValidUntil: { $gte: today },
-    }).populate("zone");
-
-    if (!member) {
-      const errorData = { valid: false, message: "આ સભ્ય કાર્ડ અમાન્ય છે" };
-
-      if (req.accepts("html")) {
-        const body = `<div class="card error"><h2>અમાન્ય કાર્ડ</h2><p>આ સભ્ય કાર્ડ અમાન્ય છે અથવા રિન્યુ કરવાની જરૂર છે.</p></div>`;
-        return sendHtmlResponse(res, 404, "અમાન્ય કાર્ડ", body);
-      } else {
-        return res.status(404).json(errorData);
-      }
-    }
-
-    // ... (success response)
-    // ✅ --- DATE FORMATTING CHANGED ---
-    const issueDate = formatDateDDMMYYYY(member.issueDate);
-    const validUntilDate = formatDateDDMMYYYY(member.membershipValidUntil);
-    // --- END ---
-
-    const successData = {
-      valid: true,
-      message: "આ સભ્ય કાર્ડ માન્ય છે",
-      trust: "લુહાર સમાજ સાવરકુંડલા ટ્રસ્ટ રજી નં. ૧૧૪૫ એ",
-      dateOfIssue: issueDate,
-      validUntil: validUntilDate,
-      સભ્યનં: member.uniqueNumber,
-    };
-
-    if (req.accepts("html")) {
       const body = `
-        <div class="card success">
-          <h2>માન્ય કાર્ડ</h2>
-          <p>આ સભ્ય કાર્ડ માન્ય છે.</p>
-          <p class="data-item"><strong>ટ્રસ્ટ:</strong> ${successData.trust}</p>
-          <p class="data-item"><strong>સભ્ય નં:</strong> ${successData.સભ્યનં}</p>
-          <p class="data-item"><strong>ઇસ્યુ તારીખ:</strong> ${successData.dateOfIssue}</p>
-          <p class="data-item"><strong>આ તારીખ સુધી માન્ય:</strong> ${successData.validUntil}</p>
+        <div class="card error">
+          <h2>અમાન્ય કાર્ડ</h2>
+          <p>આ સભ્ય કાર્ડ માન્ય નથી.</p>
         </div>
       `;
-      return sendHtmlResponse(res, 200, "માન્ય કાર્ડ", body);
-    } else {
-      return res.json(successData);
+      return sendHtmlResponse(res, 400, "અમાન્ય કાર્ડ", body);
     }
+
+    const member = await Member.findOne({
+      $or: queryParts,
+    }).populate("zone");
+
+    if (!member || member.isDeleted === true) {
+      const body = `
+        <div class="card error">
+          <h2>અમાન્ય કાર્ડ</h2>
+          <p>આ સભ્ય કાર્ડ માન્ય નથી.</p>
+        </div>
+      `;
+      return sendHtmlResponse(res, 404, "અમાન્ય કાર્ડ", body);
+    }
+
+    const issueDate = formatDateDDMMYYYY(member.issueDate);
+
+    const body = `
+      <div class="card success">
+        <h2>માન્ય કાર્ડ</h2>
+        <p>આ સભ્ય કાર્ડ માન્ય છે.</p>
+        <p class="data-item"><strong>ટ્રસ્ટ:</strong> લુહાર સમાજ સાવરકુંડલા ટ્રસ્ટ રજી નં. ૧૧૪૫ એ</p>
+        <p class="data-item"><strong>સભ્ય નં:</strong> ${member.uniqueNumber}</p>
+        <p class="data-item"><strong>ઇસ્યુ તારીખ:</strong> ${issueDate}</p>
+      </div>
+    `;
+    return sendHtmlResponse(res, 200, "માન્ય કાર્ડ", body);
   } catch (err) {
     console.error("QR verify error:", err);
-    const errorData = { valid: false, message: "સર્વર ભૂલ" };
-    if (req.accepts("html")) {
-      const body = `<div class="card error"><h2>સર્વર ભૂલ</h2><p>ચકાસણી કરતી વખતે સર્વર ભૂલ આવી.</p></div>`;
-      return sendHtmlResponse(res, 500, "સર્વર ભૂલ", body);
-    } else {
-      return res.status(500).json(errorData);
-    }
+    const body = `
+      <div class="card error">
+        <h2>અમાન્ય કાર્ડ</h2>
+        <p>આ સભ્ય કાર્ડ માન્ય નથી.</p>
+      </div>
+    `;
+    return sendHtmlResponse(res, 500, "અમાન્ય કાર્ડ", body);
   }
 });
 

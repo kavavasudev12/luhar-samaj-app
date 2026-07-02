@@ -36,7 +36,6 @@ import {
   Select,
   MenuItem,
   Card,
-  CardContent,
 } from "@mui/material";
 import {
   Check,
@@ -119,7 +118,7 @@ export default function Requests() {
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, message, severity });
   };
-  
+
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
@@ -295,13 +294,13 @@ export default function Requests() {
   const getRequestData = (request) => {
     if (!request) return {};
     return {
-      headName: request.head?.name || "-", 
-      rationNo: request.rationNo || "-", 
+      headName: request.head?.name || "-",
+      rationNo: request.rationNo || "-",
       address: request.address || "-",
-      city: request.city || "-", 
-      mobile: request.mobile || "-", 
+      city: request.city || "-",
+      mobile: request.mobile || "-",
       additionalMobiles: request.additionalMobiles || [],
-      pincode: request.pincode || "-", 
+      pincode: request.pincode || "-",
       zone: request.zone || null,
       familyMembers: request.familyMembers || []
     };
@@ -321,11 +320,11 @@ export default function Requests() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [{ data: reqs }, { data: zs }] = await Promise.all([ 
-        getRequests(), 
-        getPublicZones() 
+      const [{ data: reqs }, { data: zs }] = await Promise.all([
+        getRequests(),
+        getPublicZones()
       ]);
-      
+
       setRows((reqs || []).map(req => ({ ...req, status: (req.status || 'pending').toLowerCase() })));
       setZones(zs || []);
       const zmap = {};
@@ -371,8 +370,8 @@ export default function Requests() {
   const sortedRequests = [...filteredRows].sort((a, b) => Number(a.uniqueNumber || 0) - Number(b.uniqueNumber || 0));
 
   const onOpenApprove = (row) => {
-    setSelected(row); 
-    setSabhyaNo(row.uniqueNumber ? String(row.uniqueNumber) : ""); 
+    setSelected(row);
+    setSabhyaNo(row.uniqueNumber ? String(row.uniqueNumber) : "");
     setRequestNumber(""); // 🔹 NEW: Clear request number state on open
     setApproveOpen(true);
   };
@@ -393,7 +392,7 @@ export default function Requests() {
       showSnackbar("રિક્વેસ્ટ નંબર ધન પૂર્ણાંક હોવો જોઈએ. (Request Number must be a positive integer)", "error");
       return;
     }
-    
+
     setSubmitting(true);
     try {
       // 🔹 MODIFIED: Pass an object with uniqueNumber and requestNumber
@@ -401,8 +400,8 @@ export default function Requests() {
         uniqueNumber: sabhyaNo,
         requestNumber: requestNumber
       };
-      await approveRequest(selected._id, payload); 
-      
+      await approveRequest(selected._id, payload);
+
       showSnackbar("Request approved and member created!", "success");
       setApproveOpen(false);
       await load();
@@ -423,7 +422,7 @@ export default function Requests() {
     try {
       // ✅ FIX: Removed the second argument ("Rejected by admin") 
       // to match the backend DELETE route which doesn't accept notes.
-      await declineRequest(selected._id); 
+      await declineRequest(selected._id);
       showSnackbar("Request rejected.", "info");
       setDeclineOpen(false);
       await load();
@@ -448,7 +447,7 @@ export default function Requests() {
     }
     return <Chip label={label} color={color} size="small" />;
   };
-  
+
   const renderMobileRow = (r) => {
     const data = getRequestData(r);
     return (
@@ -532,7 +531,7 @@ export default function Requests() {
           </>
         )}
       </Stack>
-      
+
       {/* Details Dialog */}
       <Dialog open={detailOpen} onClose={() => { setDetailOpen(false); setEditMode(false); }} fullWidth maxWidth="md" fullScreen={isMobile}>
         <DialogTitle>{editMode ? "અરજી સુધારો (Edit Request)" : "અરજી વિગતો (Request Details)"}</DialogTitle>
@@ -546,30 +545,30 @@ export default function Requests() {
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
-                      <TextField 
-                        label="મુખ્ય નામ" 
-                        value={editForm.headName} 
-                        onChange={(e) => setEditForm({ ...editForm, headName: e.target.value })} 
-                        fullWidth 
-                        required 
+                      <TextField
+                        label="મુખ્ય નામ"
+                        value={editForm.headName}
+                        onChange={(e) => setEditForm({ ...editForm, headName: e.target.value })}
+                        fullWidth
+                        required
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <TextField 
-                        label="રેશન કૉર્ડ નંબર" 
-                        value={editForm.rationNo} 
-                        onChange={(e) => setEditForm({ ...editForm, rationNo: e.target.value })} 
-                        fullWidth 
-                        required 
+                      <TextField
+                        label="રેશન કૉર્ડ નંબર"
+                        value={editForm.rationNo}
+                        onChange={(e) => setEditForm({ ...editForm, rationNo: e.target.value })}
+                        fullWidth
+                        required
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <TextField 
-                        label="મોબાઇલ નંબર" 
-                        value={editForm.mobile} 
-                        onChange={(e) => setEditForm({ ...editForm, mobile: e.target.value })} 
-                        fullWidth 
-                        required 
+                      <TextField
+                        label="મોબાઇલ નંબર"
+                        value={editForm.mobile}
+                        onChange={(e) => setEditForm({ ...editForm, mobile: e.target.value })}
+                        fullWidth
+                        required
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -590,30 +589,30 @@ export default function Requests() {
                       </FormControl>
                     </Grid>
                     <Grid item xs={12}>
-                      <TextField 
-                        label="સરનામું" 
-                        value={editForm.address} 
-                        onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} 
-                        fullWidth 
-                        multiline 
-                        rows={2} 
-                        required 
+                      <TextField
+                        label="સરનામું"
+                        value={editForm.address}
+                        onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+                        fullWidth
+                        multiline
+                        rows={2}
+                        required
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <TextField 
-                        label="શહેર" 
-                        value={editForm.city} 
-                        onChange={(e) => setEditForm({ ...editForm, city: e.target.value })} 
-                        fullWidth 
+                      <TextField
+                        label="શહેર"
+                        value={editForm.city}
+                        onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
+                        fullWidth
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <TextField 
-                        label="પિનકોડ" 
-                        value={editForm.pincode} 
-                        onChange={(e) => setEditForm({ ...editForm, pincode: e.target.value })} 
-                        fullWidth 
+                      <TextField
+                        label="પિનકોડ"
+                        value={editForm.pincode}
+                        onChange={(e) => setEditForm({ ...editForm, pincode: e.target.value })}
+                        fullWidth
                       />
                     </Grid>
                   </Grid>
@@ -632,49 +631,49 @@ export default function Requests() {
                         </Stack>
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={6}>
-                            <TextField 
-                              label="નામ" 
-                              value={member.name} 
-                              onChange={(e) => handleFamilyMemberChange(index, "name", e.target.value)} 
-                              fullWidth 
-                              required 
+                            <TextField
+                              label="નામ"
+                              value={member.name}
+                              onChange={(e) => handleFamilyMemberChange(index, "name", e.target.value)}
+                              fullWidth
+                              required
                             />
                           </Grid>
                           <Grid item xs={12} sm={6}>
-                            <TextField 
-                              label="સબંધ" 
-                              value={member.relation} 
-                              onChange={(e) => handleFamilyMemberChange(index, "relation", e.target.value)} 
-                              fullWidth 
-                              required 
+                            <TextField
+                              label="સબંધ"
+                              value={member.relation}
+                              onChange={(e) => handleFamilyMemberChange(index, "relation", e.target.value)}
+                              fullWidth
+                              required
                             />
                           </Grid>
                           <Grid item xs={12} sm={6}>
-                            <TextField 
-                              label="જન્મતારીખ" 
-                              type="date" 
-                              InputLabelProps={{ shrink: true }} 
-                              value={member.birthdate} 
-                              onChange={(e) => handleFamilyMemberChange(index, "birthdate", e.target.value)} 
-                              fullWidth 
+                            <TextField
+                              label="જન્મતારીખ"
+                              type="date"
+                              InputLabelProps={{ shrink: true }}
+                              value={member.birthdate}
+                              onChange={(e) => handleFamilyMemberChange(index, "birthdate", e.target.value)}
+                              fullWidth
                             />
                           </Grid>
                           <Grid item xs={6} sm={3}>
-                            <TextField 
-                              label="ઉંમર" 
-                              type="number" 
-                              value={member.age} 
-                              onChange={(e) => handleFamilyMemberChange(index, "age", e.target.value)} 
-                              fullWidth 
-                              required 
+                            <TextField
+                              label="ઉંમર"
+                              type="number"
+                              value={member.age}
+                              onChange={(e) => handleFamilyMemberChange(index, "age", e.target.value)}
+                              fullWidth
+                              required
                             />
                           </Grid>
                           <Grid item xs={6} sm={3}>
                             <FormControl fullWidth required>
                               <InputLabel>લિંગ</InputLabel>
-                              <Select 
-                                value={member.gender} 
-                                onChange={(e) => handleFamilyMemberChange(index, "gender", e.target.value)} 
+                              <Select
+                                value={member.gender}
+                                onChange={(e) => handleFamilyMemberChange(index, "gender", e.target.value)}
                                 label="લિંગ"
                               >
                                 <MenuItem value="male">પુરુષ</MenuItem>
@@ -696,23 +695,23 @@ export default function Requests() {
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
-                      <TextField 
-                        label="સભ્ય નંબર (Unique Number) *" 
-                        value={editForm.uniqueNumber} 
-                        onChange={(e) => setEditForm({ ...editForm, uniqueNumber: e.target.value })} 
-                        fullWidth 
+                      <TextField
+                        label="સભ્ય નંબર (Unique Number) *"
+                        value={editForm.uniqueNumber}
+                        onChange={(e) => setEditForm({ ...editForm, uniqueNumber: e.target.value })}
+                        fullWidth
                         type="number"
                         required
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <TextField 
-                        label="ઇસ્યુ તારીખ (Issue Date) *" 
-                        type="date" 
-                        InputLabelProps={{ shrink: true }} 
-                        value={editForm.issueDate} 
-                        onChange={(e) => setEditForm({ ...editForm, issueDate: e.target.value })} 
-                        fullWidth 
+                      <TextField
+                        label="ઇસ્યુ તારીખ (Issue Date) *"
+                        type="date"
+                        InputLabelProps={{ shrink: true }}
+                        value={editForm.issueDate}
+                        onChange={(e) => setEditForm({ ...editForm, issueDate: e.target.value })}
+                        fullWidth
                         required
                       />
                     </Grid>
@@ -723,7 +722,7 @@ export default function Requests() {
               // Read only view
               <Stack spacing={3} sx={{ mt: 1 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>{renderStatusChip(detailRequest.status)}<Typography variant="body2" color="text.secondary">અરજી તારીખ: {detailRequest.createdAt ? new Date(detailRequest.createdAt).toLocaleString() : "-"}</Typography></Box>
-                
+
                 <Box>
                   <Typography variant="h6" gutterBottom>મુખ્ય સભ્યની માહિતી</Typography>
                   <Grid container spacing={2}>
@@ -745,7 +744,7 @@ export default function Requests() {
                     <Grid item xs={12} sm={6}><TextField label="ઇસ્યુ તારીખ (Issue Date)" value={fmtDate(detailRequest.issueDate)} fullWidth InputProps={{ readOnly: true }} /></Grid>
                   </Grid>
                 </Box>
-                
+
                 <Box>
                   <Typography variant="h6" gutterBottom>પરિવારના સભ્યો ({getRequestData(detailRequest).familyMembers.length})</Typography>
                   {getRequestData(detailRequest).familyMembers && getRequestData(detailRequest).familyMembers.length > 0 ? (<Stack spacing={2}>{getRequestData(detailRequest).familyMembers.map((member, index) => (<Accordion key={index} defaultExpanded={index === 0}><AccordionSummary expandIcon={<ExpandMore />}><Typography>{member.name || "અજ્ઞાત"} ({member.relation || "અજ્ઞાત સંબંધ"})</Typography></AccordionSummary><AccordionDetails><Grid container spacing={2}><Grid item xs={12} sm={6}><TextField label="નામ" value={member.name || "-"} fullWidth InputProps={{ readOnly: true }} /></Grid><Grid item xs={12} sm={6}><TextField label="સબંધ" value={member.relation || "-"} fullWidth InputProps={{ readOnly: true }} /></Grid><Grid item xs={12} sm={6}><TextField label="જન્મતારીખ" value={fmtDate(member.birthdate)} fullWidth InputProps={{ readOnly: true }} /></Grid><Grid item xs={12} sm={6}><TextField label="ઉંમર" value={member.age || calcAgeFromDOB(member.birthdate) || "-"} fullWidth InputProps={{ readOnly: true }} /></Grid><Grid item xs={12}><TextField label="લિંગ" value={member.gender === 'male' ? 'પુરુષ' : member.gender === 'female' ? 'સ્ત્રી' : 'અન્ય'} fullWidth InputProps={{ readOnly: true }} /></Grid></Grid></AccordionDetails></Accordion>))}</Stack>) : (<Typography variant="body2">કોઈ પરિવારના સભ્યો નથી</Typography>)}
@@ -784,30 +783,30 @@ export default function Requests() {
           {/* 🔹 MODIFIED: Wrapped in Stack and updated text */}
           <Stack spacing={2} sx={{ pt: 1 }}>
             <Typography>કૃપા કરી આ સભ્ય માટે <strong>સભ્ય નંબર</strong> અને <strong>રિક્વેસ્ટ નંબર</strong> દાખલ કરો:</Typography>
-            <TextField 
-              label="સભ્ય નંબર" 
-              value={sabhyaNo} 
-              onChange={(e) => setSabhyaNo(e.target.value)} 
-              fullWidth 
-              autoFocus 
-              inputProps={{ maxLength: 20 }} 
+            <TextField
+              label="સભ્ય નંબર"
+              value={sabhyaNo}
+              onChange={(e) => setSabhyaNo(e.target.value)}
+              fullWidth
+              autoFocus
+              inputProps={{ maxLength: 20 }}
             />
             {/* 🔹 NEW: Added TextField for Request Number */}
-            <TextField 
-              label="રિક્વેસ્ટ નંબર" 
-              value={requestNumber} 
-              onChange={(e) => setRequestNumber(e.target.value)} 
-              fullWidth 
-              inputProps={{ maxLength: 20 }} 
+            <TextField
+              label="રિક્વેસ્ટ નંબર"
+              value={requestNumber}
+              onChange={(e) => setRequestNumber(e.target.value)}
+              fullWidth
+              inputProps={{ maxLength: 20 }}
             />
           </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setApproveOpen(false)}>રદ કરો</Button>
           {/* 🔹 MODIFIED: Updated disabled check */}
-          <Button 
-            variant="contained" 
-            onClick={onApprove} 
+          <Button
+            variant="contained"
+            onClick={onApprove}
             disabled={submitting || !sabhyaNo.trim() || !requestNumber.trim()}
           >
             {submitting ? "મંજૂરી થઈ રહી છે..." : "મંજૂર કરો"}
@@ -821,7 +820,7 @@ export default function Requests() {
         <DialogContent><Typography>શું તમે આ અરજી <strong>નામંજૂર</strong> કરવા ઈચ્છો છો?</Typography></DialogContent>
         <DialogActions><Button onClick={() => setDeclineOpen(false)}>રદ કરો</Button><Button variant="contained" color="error" onClick={onDeclineConfirm} disabled={submitting}>{submitting ? "નામંજૂરી થઈ રહી છે..." : "નામંજૂર કરો"}</Button></DialogActions>
       </Dialog>
-      
+
       <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: "top", horizontal: "center" }} sx={{ "& .MuiSnackbarContent-root": { width: isMobile ? "90%" : "auto" } }}>
         <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} variant="filled" sx={{ width: "100%" }}>{snackbar.message}</Alert>
       </Snackbar>

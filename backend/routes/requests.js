@@ -65,7 +65,7 @@ function getFinancialYearEnd(date) {
 function getFinancialYearString(date) {
   const start = getFinancialYearStart(date);
   const end = getFinancialYearEnd(date);
-  
+
   const formatDate = (d) => {
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -89,8 +89,8 @@ function normalizeFamilyMembers(input) {
           : (typeof f.age === "number"
             ? f.age
             : typeof f.age === "string" && f.age.trim() !== "" && !isNaN(Number(f.age))
-            ? Number(f.age)
-            : undefined);
+              ? Number(f.age)
+              : undefined);
       const gender =
         f.gender && ["male", "female", "other"].includes(String(f.gender).toLowerCase())
           ? String(f.gender).toLowerCase()
@@ -421,7 +421,7 @@ router.post("/:id/approve", auth, async (req, res) => {
       requestNumber: requestNumber,
       after: newMember.toObject(),
       req,
-      requestNumber: Number(requestNumber), 
+      requestNumber: Number(requestNumber),
     });
 
     res.status(201).json({ message: "Member created successfully.", member: newMember });
@@ -440,14 +440,14 @@ router.post("/:id/approve", auth, async (req, res) => {
 router.get("/verify/:uniqueNumber", async (req, res) => {
   try {
     const { uniqueNumber } = req.params;
-    
+
     const member = await Member.findOne({ uniqueNumber })
       .populate("zone", "name number");
-    
+
     if (!member) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         valid: false,
-        error: "Member not found" 
+        error: "Member not found"
       });
     }
 
@@ -459,7 +459,7 @@ router.get("/verify/:uniqueNumber", async (req, res) => {
     if (isExpired) {
       const newValidityStart = getFinancialYearStart(today);
       const newValidityEnd = getFinancialYearEnd(today);
-      
+
       member.membershipValidFrom = newValidityStart;
       member.membershipValidUntil = newValidityEnd;
       await member.save();
@@ -485,7 +485,7 @@ router.get("/verify/:uniqueNumber", async (req, res) => {
 
     // ✅ Return active card details
     const validFrom = member.membershipValidFrom || getFinancialYearStart(validUntil);
-    
+
     res.json({
       valid: true,
       status: "active",
@@ -506,9 +506,9 @@ router.get("/verify/:uniqueNumber", async (req, res) => {
 
   } catch (err) {
     console.error("GET /verify/:uniqueNumber error:", err);
-    res.status(500).json({ 
+    res.status(500).json({
       valid: false,
-      error: "Failed to verify member" 
+      error: "Failed to verify member"
     });
   }
 });

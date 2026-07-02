@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
 
 
 import {
   Container, Grid, Card, CardContent, Typography,
-  CircularProgress, Alert, Box, useTheme, List, ListItem, ListItemText, ListItemAvatar, Avatar, Paper
+  CircularProgress, Alert, Box, useTheme
 } from '@mui/material';
 import {
   People as PeopleIcon,
@@ -14,11 +13,10 @@ import {
   TrendingUp as TrendingUpIcon,
   Rule as RequestsIcon,
   DeleteOutline as DeleteIcon,
-  History as ActivityIcon,
   Person as PersonIcon
 } from '@mui/icons-material';
 import { getDashboardData } from '../services/dashboardService';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, AreaChart, Area } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);

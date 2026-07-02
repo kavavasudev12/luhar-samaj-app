@@ -68,8 +68,8 @@ const HeadDisplay = ({ head }) => {
         <strong>{head.name || 'નામ નથી'}</strong>
       </Typography>
       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pl: 1.5, mt: 0.5 }}>
-        જન્મ તારીખ: {formatDate(head.birthdate)} | 
-        ઉંમર: {head.age || 'ઉપલબ્ધ નથી'} | 
+        જન્મ તારીખ: {formatDate(head.birthdate)} |
+        ઉંમર: {head.age || 'ઉપલબ્ધ નથી'} |
         લિંગ: {head.gender || 'ઉપલબ્ધ નથી'}
       </Typography>
     </Box>
@@ -106,8 +106,8 @@ const FamilyMembersDisplay = ({ members }) => {
             </Typography>
             {(member.birthdate || member.age || member.gender) && (
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pl: 1.5 }}>
-                જન્મ તારીખ: {formatDate(member.birthdate)} | 
-                ઉંમર: {member.age || 'ઉપલબ્ધ નથી'} | 
+                જન્મ તારીખ: {formatDate(member.birthdate)} |
+                ઉંમર: {member.age || 'ઉપલબ્ધ નથી'} |
                 લિંગ: {member.gender || 'ઉપલબ્ધ નથી'}
               </Typography>
             )}
@@ -123,9 +123,9 @@ const FamilyMembersDisplay = ({ members }) => {
  * Renders simple 'before' and 'after' values.
  */
 const renderValue = (value) => {
-  const chipStyles = { 
-    whiteSpace: 'normal', 
-    height: 'auto', 
+  const chipStyles = {
+    whiteSpace: 'normal',
+    height: 'auto',
     minHeight: '22px',
     p: '2px 6px',
     alignItems: 'flex-start'
@@ -140,7 +140,7 @@ const renderValue = (value) => {
   if (typeof value === 'object') {
     return <Chip label={JSON.stringify(value)} size="small" variant="outlined" sx={chipStyles} />;
   }
-  
+
   // 3. For strings, numbers, booleans
   return <Chip label={String(value)} size="small" variant="outlined" sx={chipStyles} />;
 };
@@ -153,13 +153,13 @@ const ChangesDisplay = ({ changes }) => {
   }
 
   const changesArray = Array.isArray(changes) ? changes : Object.entries(changes).map(([field, values]) => ({
-      field,
-      before: values.before,
-      after: values.after
+    field,
+    before: values.before,
+    after: values.after
   }));
-  
+
   if (changesArray.length === 0) {
-      return <Typography variant="body2" color="text.secondary">કોઈ ફેરફારો નોંધાયેલા નથી.</Typography>;
+    return <Typography variant="body2" color="text.secondary">કોઈ ફેરફારો નોંધાયેલા નથી.</Typography>;
   }
 
   const getFieldLabel = (field) => {
@@ -206,7 +206,7 @@ const ChangesDisplay = ({ changes }) => {
               <TableCell component="th" scope="row" sx={{ verticalAlign: 'top' }}>
                 <strong>{getFieldLabel(change.field)}</strong>
               </TableCell>
-              
+
               {/* --- THIS IS THE KEY CHANGE --- */}
               {change.field === 'familyMembers' ? (
                 <>
@@ -268,7 +268,7 @@ const getDisplayName = (log) => {
         return nameField.after;
       }
       if (nameField.before) {
-        return nameField.before; 
+        return nameField.before;
       }
     }
   }
@@ -281,7 +281,7 @@ const LogEntryRow = ({ log }) => {
   const displayName = getDisplayName(log);
 
   const getActionLabel = (action) => {
-    switch(action) {
+    switch (action) {
       case 'create': return 'નવો સભ્ય ઉમેર્યો';
       case 'update': return 'સભ્ય માહિતી સુધારી';
       case 'delete': return 'સોફ્ટ ડિલીટ';
@@ -294,7 +294,7 @@ const LogEntryRow = ({ log }) => {
   };
 
   const getActionColor = (action) => {
-    switch(action) {
+    switch (action) {
       case 'create': return 'success';
       case 'delete': return 'error';
       case 'restore': return 'info';
@@ -307,9 +307,9 @@ const LogEntryRow = ({ log }) => {
 
   return (
     <React.Fragment>
-      <TableRow 
-        hover 
-        onClick={() => setOpen(!open)} 
+      <TableRow
+        hover
+        onClick={() => setOpen(!open)}
         sx={{ '& > *': { borderBottom: 'unset' }, cursor: 'pointer' }}
       >
         <TableCell sx={{ width: '10px' }}>
@@ -317,7 +317,7 @@ const LogEntryRow = ({ log }) => {
             {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
           </IconButton>
         </TableCell>
-        <TableCell><Chip label={log.requestNumber} size="small" variant="outlined"/></TableCell>
+        <TableCell><Chip label={log.requestNumber} size="small" variant="outlined" /></TableCell>
         <TableCell>{new Date(log.timestamp).toLocaleString("gu-IN")}</TableCell>
         <TableCell>{log.user?.name || 'સિસ્ટમ'}</TableCell>
         <TableCell><Chip label={getActionLabel(log.action)} size="small" color={getActionColor(log.action)} /></TableCell>
@@ -406,7 +406,7 @@ const AuditLogsPage = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalLogs: 0 });
-  
+
   // State for filters
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -444,34 +444,34 @@ const AuditLogsPage = () => {
     setFilters(prev => ({ ...prev, [name]: value }));
     setPage(0);
   };
-  
+
   //
   // --- 🔻🔻 MODIFIED handleExport 🔻🔻 ---
   //
   const handleExport = async () => {
-      try {
-        // We no longer need format: 'csv'
-        const params = { search: searchTerm, ...filters };
-        Object.keys(params).forEach(key => !params[key] && delete params[key]);
+    try {
+      // We no longer need format: 'csv'
+      const params = { search: searchTerm, ...filters };
+      Object.keys(params).forEach(key => !params[key] && delete params[key]);
 
-        // This calls the exports.js route
-        const res = await api.get('/export/audit', { params, responseType: 'blob' });
-        
-        // --- FIX 1: Change blob type to match Excel ---
-        const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        // --- FIX 2: Change file extension to .xlsx ---
-        a.download = 'audit_logs.xlsx';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
+      // This calls the exports.js route
+      const res = await api.get('/export/audit', { params, responseType: 'blob' });
 
-      } catch (err) {
-          console.error("Failed to export logs:", err);
-      }
+      // --- FIX 1: Change blob type to match Excel ---
+      const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      // --- FIX 2: Change file extension to .xlsx ---
+      a.download = 'audit_logs.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+    } catch (err) {
+      console.error("Failed to export logs:", err);
+    }
   };
   //
   // --- 🔺🔺 END OF MODIFICATION 🔺🔺 ---
@@ -479,84 +479,84 @@ const AuditLogsPage = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
-        <Typography variant="h5" sx={{ mb: 2, fontWeight: 600 }}>વિનંતી પૃષ્ઠ</Typography>
-        
-        <Paper sx={{ p: 2, mb: 2, borderRadius: 3 }}>
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="center">
-                <TextField
-                    fullWidth
-                    variant="outlined"
-                    placeholder="વપરાશકર્તા, ક્રિયા, અથવા ઓડિટ # દ્વારા શોધો"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && fetchLogs()}
-                    InputProps={{
-                        startAdornment: <InputAdornment position="start"><Search /></InputAdornment>,
-                        endAdornment: searchTerm && <IconButton size="small" onClick={() => setSearchTerm('')}><Close fontSize="small" /></IconButton>
-                    }}
-                />
-                <FormControl fullWidth><InputLabel>ક્રિયા</InputLabel>
-                    <Select name="action" value={filters.action} label="ક્રિયા" onChange={handleFilterChange}>
-                        <MenuItem value="">બધી ક્રિયાઓ</MenuItem>
-                        <MenuItem value="create">બનાવ્યું</MenuItem>
-                        <MenuItem value="update">અપડેટ</MenuItem>
-                        <MenuItem value="delete">કાઢી નાખ્યું</MenuItem>
-                        <MenuItem value="restore">પુનઃસ્થાપિત</MenuItem> 
-                    </Select>
-                </FormControl>
-                <FormControl fullWidth><InputLabel>એન્ટિટી પ્રકાર</InputLabel>
-                    <Select name="entityType" value={filters.entityType} label="એન્ટિટી પ્રકાર" onChange={handleFilterChange}>
-                        <MenuItem value="">બધી એન્ટિટીઓ</MenuItem>
-                        <MenuItem value="Member">સભ્ય</MenuItem>
-                        <MenuItem value="Request">વિનંતી</MenuItem>
-                        <MenuItem value="Zone">ઝોન</MenuItem>
-                        <MenuItem value="User">વપરાશકર્તા</MenuItem>
-                    </Select>
-                </FormControl>
-                <Stack direction="row" spacing={1}>
-                    <Button variant="contained" onClick={fetchLogs} startIcon={<Refresh />}>તાજું કરો</Button>
-                    <Button variant="outlined" color="success" onClick={handleExport} startIcon={<Download />}>નિકાસ કરો</Button>
-                </Stack>
-            </Stack>
-        </Paper>
+      <Typography variant="h5" sx={{ mb: 2, fontWeight: 600 }}>વિનંતી પૃષ્ઠ</Typography>
 
-        <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell /> {/* Empty cell for expand icon */}
-                        <TableCell>વિનંતી નંબર</TableCell>
-                        <TableCell>સમય</TableCell>
-                        <TableCell>વપરાશકર્તા</TableCell>
-                        <TableCell>ક્રિયા</TableCell>
-                        <TableCell>એન્ટિટી / સભ્ય</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {loading ? (
-                        <TableRow><TableCell colSpan={6} align="center"><CircularProgress /></TableCell></TableRow>
-                    ) : logs.length > 0 ? (
-                        logs.map((log) => (
-                          <LogEntryRow key={log._id} log={log} />
-                        ))
-                    ) : (
-                        <TableRow><TableCell colSpan={6} align="center">કોઈ લોગ્સ મળ્યા નથી</TableCell></TableRow>
-                    )}
-                </TableBody>
-            </Table>
-            
-            <TablePagination
-                component="div"
-                count={pagination.totalLogs}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                onPageChange={(e, newPage) => setPage(newPage)}
-                onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }} // <-- FIX: e.guit -> e.target.value
-                rowsPerPageOptions={[10, 25, 50]}
-                labelRowsPerPage="પ્રતિ પૃષ્ઠ પંક્તિઓ:"
-                labelDisplayedRows={({ from, to, count }) => `${from}–${to} માંથી ${count !== -1 ? count : `${to} થી વધુ`}`}
-            />
-        </TableContainer>
+      <Paper sx={{ p: 2, mb: 2, borderRadius: 3 }}>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="center">
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="વપરાશકર્તા, ક્રિયા, અથવા ઓડિટ # દ્વારા શોધો"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && fetchLogs()}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"><Search /></InputAdornment>,
+              endAdornment: searchTerm && <IconButton size="small" onClick={() => setSearchTerm('')}><Close fontSize="small" /></IconButton>
+            }}
+          />
+          <FormControl fullWidth><InputLabel>ક્રિયા</InputLabel>
+            <Select name="action" value={filters.action} label="ક્રિયા" onChange={handleFilterChange}>
+              <MenuItem value="">બધી ક્રિયાઓ</MenuItem>
+              <MenuItem value="create">બનાવ્યું</MenuItem>
+              <MenuItem value="update">અપડેટ</MenuItem>
+              <MenuItem value="delete">કાઢી નાખ્યું</MenuItem>
+              <MenuItem value="restore">પુનઃસ્થાપિત</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth><InputLabel>એન્ટિટી પ્રકાર</InputLabel>
+            <Select name="entityType" value={filters.entityType} label="એન્ટિટી પ્રકાર" onChange={handleFilterChange}>
+              <MenuItem value="">બધી એન્ટિટીઓ</MenuItem>
+              <MenuItem value="Member">સભ્ય</MenuItem>
+              <MenuItem value="Request">વિનંતી</MenuItem>
+              <MenuItem value="Zone">ઝોન</MenuItem>
+              <MenuItem value="User">વપરાશકર્તા</MenuItem>
+            </Select>
+          </FormControl>
+          <Stack direction="row" spacing={1}>
+            <Button variant="contained" onClick={fetchLogs} startIcon={<Refresh />}>તાજું કરો</Button>
+            <Button variant="outlined" color="success" onClick={handleExport} startIcon={<Download />}>નિકાસ કરો</Button>
+          </Stack>
+        </Stack>
+      </Paper>
+
+      <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell /> {/* Empty cell for expand icon */}
+              <TableCell>વિનંતી નંબર</TableCell>
+              <TableCell>સમય</TableCell>
+              <TableCell>વપરાશકર્તા</TableCell>
+              <TableCell>ક્રિયા</TableCell>
+              <TableCell>એન્ટિટી / સભ્ય</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {loading ? (
+              <TableRow><TableCell colSpan={6} align="center"><CircularProgress /></TableCell></TableRow>
+            ) : logs.length > 0 ? (
+              logs.map((log) => (
+                <LogEntryRow key={log._id} log={log} />
+              ))
+            ) : (
+              <TableRow><TableCell colSpan={6} align="center">કોઈ લોગ્સ મળ્યા નથી</TableCell></TableRow>
+            )}
+          </TableBody>
+        </Table>
+
+        <TablePagination
+          component="div"
+          count={pagination.totalLogs}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(e, newPage) => setPage(newPage)}
+          onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }} // <-- FIX: e.guit -> e.target.value
+          rowsPerPageOptions={[10, 25, 50]}
+          labelRowsPerPage="પ્રતિ પૃષ્ઠ પંક્તિઓ:"
+          labelDisplayedRows={({ from, to, count }) => `${from}–${to} માંથી ${count !== -1 ? count : `${to} થી વધુ`}`}
+        />
+      </TableContainer>
     </Container>
   );
 };

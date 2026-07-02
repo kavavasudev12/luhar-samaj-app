@@ -46,13 +46,18 @@ const Header = () => {
 
   const menuItems = isLoggedIn ? loggedInMenu : guestMenu;
 
+  const handleNavigation = (path) => {
+    setDrawerOpen(false);
+    navigate(path);
+  };
+
   return (
     <>
       <AppBar position="static">
         <Toolbar>
           {/* Left side - App Name with Logo */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexGrow: 1 }}>
-            <Box 
+            <Box
               component="img"
               src="/log.png"
               alt="Luhar Samaj Logo"
@@ -69,8 +74,8 @@ const Header = () => {
                 backgroundColor: 'transparent'
               }}
             />
-            <Box 
-              sx={{ 
+            <Box
+              sx={{
                 display: 'none',
                 width: { xs: 32, md: 40 },
                 height: { xs: 32, md: 40 },
@@ -129,14 +134,13 @@ const Header = () => {
               <ListItem
                 button
                 key={item.text}
-                component={Link}
-                to={item.path}
+                onClick={() => handleNavigation(item.path)}
               >
                 <ListItemText primary={item.text} />
               </ListItem>
             ))}
             {isLoggedIn && (
-              <ListItem button onClick={handleLogout}>
+              <ListItem button onClick={() => { setDrawerOpen(false); handleLogout(); }}>
                 <ListItemText primary="લોગઆઉટ" />
               </ListItem>
             )}

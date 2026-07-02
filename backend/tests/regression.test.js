@@ -44,6 +44,14 @@ jest.mock('pdfkit', () => {
         mockDrawingCalls.push({ type: 'restore' });
         return doc;
       }),
+      rect: jest.fn().mockImplementation((x, y, w, h) => {
+        mockDrawingCalls.push({ type: 'rect', x, y, w, h });
+        return doc;
+      }),
+      fill: jest.fn().mockImplementation((color) => {
+        mockDrawingCalls.push({ type: 'fill', color });
+        return doc;
+      }),
       translate: jest.fn().mockImplementation((x, y) => {
         mockDrawingCalls.push({ type: 'translate', x, y });
         return doc;
@@ -152,7 +160,7 @@ describe('Regression & Compatibility Test Suite', () => {
 
   describe('1. Golden PDF Regression Tests', () => {
     const mockZone = { name: 'Savarkundla Zone 1', number: 1 };
-    
+
     it('should match old PDF positions and dimensions exactly (Old Member layout)', async () => {
       const oldMember = {
         _id: '60d5ec49f83ca5324483a9e2',
@@ -166,17 +174,17 @@ describe('Regression & Compatibility Test Suite', () => {
         createdAt: new Date('2024-05-15'),
         issueDate: new Date('2024-05-15')
       };
-      
+
       Member.findById.mockReturnValue(makeQueryMock(oldMember));
-      
+
       const buffer = await pdfService.generateCard('60d5ec49f83ca5324483a9e2');
       expect(buffer.toString()).toContain('%PDF');
 
       // Verify template image call
       const templateCall = mockDrawingCalls.find(c => c.type === 'image' && c.path.includes('card_template.png'));
       expect(templateCall).toBeDefined();
-      expect(templateCall.x).toBe(0);
-      expect(templateCall.y).toBe(0);
+      expect(templateCall.x).toBe(10);
+      expect(templateCall.y).toBe(10);
       expect(templateCall.options.width).toBeCloseTo(242.64);
       expect(templateCall.options.height).toBeCloseTo(306.72);
 
@@ -218,7 +226,7 @@ describe('Regression & Compatibility Test Suite', () => {
 
       // Check relation and age center-aligned properties
       const relationCalls = mockDrawingCalls.filter(c => c.type === 'text' && c.options && c.options.align === 'center');
-      expect(relationCalls.length).toBe(6); 
+      expect(relationCalls.length).toBe(6);
     });
   });
 

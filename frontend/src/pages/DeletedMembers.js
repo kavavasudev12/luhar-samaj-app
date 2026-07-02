@@ -57,19 +57,19 @@ export default function DeletedMembers() {
     const [filteredMembers, setFilteredMembers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
-    
+
     // Dialog states
     const [detailsOpen, setDetailsOpen] = useState(false);
     const [selectedMember, setSelectedMember] = useState(null);
-    
+
     const [restoreOpen, setRestoreOpen] = useState(false);
     const [memberToRestore, setMemberToRestore] = useState(null);
     const [restoreRequestNumber, setRestoreRequestNumber] = useState('');
     const [restoreReason, setRestoreReason] = useState('');
-    
+
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [memberToDelete, setMemberToDelete] = useState(null);
-    
+
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const userRole = localStorage.getItem('userRole');
 
@@ -223,18 +223,18 @@ export default function DeletedMembers() {
                             }}
                             sx={{ minWidth: 320 }}
                         />
-                        <Button 
-                            variant="contained" 
-                            color="success" 
+                        <Button
+                            variant="contained"
+                            color="success"
                             startIcon={<DownloadIcon />}
                             onClick={handleExportExcel}
                             sx={{ borderRadius: 2 }}
                         >
                             Excel ડાઉનલોડ
                         </Button>
-                        <Button 
-                            variant="outlined" 
-                            color="success" 
+                        <Button
+                            variant="outlined"
+                            color="success"
                             startIcon={<DownloadIcon />}
                             onClick={handleExportCSV}
                             sx={{ borderRadius: 2 }}
@@ -274,62 +274,62 @@ export default function DeletedMembers() {
                             {filteredMembers
                                 .sort((a, b) => Number(a.uniqueNumber || 0) - Number(b.uniqueNumber || 0))
                                 .map((member) => (
-                                <TableRow key={member._id} hover>
-                                    <TableCell>{member.uniqueNumber || 'N/A'}</TableCell>
-                                    <TableCell sx={{ fontWeight: 600 }}>{member.head?.name}</TableCell>
-                                    <TableCell>{member.rationNo}</TableCell>
-                                    <TableCell>{member.mobile}</TableCell>
-                                    <TableCell>{member.zone?.name || 'N/A'}</TableCell>
-                                    <TableCell>{fmtDate(member.deletedAt)}</TableCell>
-                                    <TableCell>{member.deletedBy?.name || 'N/A'}</TableCell>
-                                    <TableCell>
-                                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                                            <Button
-                                                size="small"
-                                                variant="outlined"
-                                                color="primary"
-                                                startIcon={<ViewIcon />}
-                                                onClick={() => handleOpenDetails(member)}
-                                                sx={{ borderRadius: 1.5 }}
-                                            >
-                                                વિગતો
-                                            </Button>
-                                            <Button
-                                                size="small"
-                                                variant="contained"
-                                                color="success"
-                                                startIcon={<RestoreIcon />}
-                                                onClick={() => handleOpenRestore(member)}
-                                                sx={{ borderRadius: 1.5 }}
-                                            >
-                                                પુનઃસ્થાપિત
-                                            </Button>
-                                            {userRole === 'admin' && (
+                                    <TableRow key={member._id} hover>
+                                        <TableCell>{member.uniqueNumber || 'N/A'}</TableCell>
+                                        <TableCell sx={{ fontWeight: 600 }}>{member.head?.name}</TableCell>
+                                        <TableCell>{member.rationNo}</TableCell>
+                                        <TableCell>{member.mobile}</TableCell>
+                                        <TableCell>{member.zone?.name || 'N/A'}</TableCell>
+                                        <TableCell>{fmtDate(member.deletedAt)}</TableCell>
+                                        <TableCell>{member.deletedBy?.name || 'N/A'}</TableCell>
+                                        <TableCell>
+                                            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                                                <Button
+                                                    size="small"
+                                                    variant="outlined"
+                                                    color="primary"
+                                                    startIcon={<ViewIcon />}
+                                                    onClick={() => handleOpenDetails(member)}
+                                                    sx={{ borderRadius: 1.5 }}
+                                                >
+                                                    વિગતો
+                                                </Button>
                                                 <Button
                                                     size="small"
                                                     variant="contained"
-                                                    color="error"
-                                                    startIcon={<DeleteIcon />}
-                                                    onClick={() => handleOpenDelete(member)}
+                                                    color="success"
+                                                    startIcon={<RestoreIcon />}
+                                                    onClick={() => handleOpenRestore(member)}
                                                     sx={{ borderRadius: 1.5 }}
                                                 >
-                                                    કાયમી ડિલીટ
+                                                    પુનઃસ્થાપિત
                                                 </Button>
-                                            )}
-                                        </Box>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                                                {userRole === 'admin' && (
+                                                    <Button
+                                                        size="small"
+                                                        variant="contained"
+                                                        color="error"
+                                                        startIcon={<DeleteIcon />}
+                                                        onClick={() => handleOpenDelete(member)}
+                                                        sx={{ borderRadius: 1.5 }}
+                                                    >
+                                                        કાયમી ડિલીટ
+                                                    </Button>
+                                                )}
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
             )}
 
             {/* --- Details Dialog --- */}
-            <Dialog 
-                open={detailsOpen} 
-                onClose={handleCloseDetails} 
-                maxWidth="md" 
+            <Dialog
+                open={detailsOpen}
+                onClose={handleCloseDetails}
+                maxWidth="md"
                 fullWidth
                 PaperProps={{ sx: { borderRadius: 3 } }}
             >
@@ -352,17 +352,13 @@ export default function DeletedMembers() {
                                     <Card variant="outlined" sx={{ borderRadius: 2, bgcolor: 'action.hover' }}>
                                         <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
                                             <Grid container spacing={2}>
-                                                <Grid item xs={12} sm={4}>
+                                                <Grid item xs={12} sm={6}>
                                                     <Typography variant="caption" color="text.secondary">સભ્ય નંબર (Sabhya Number)</Typography>
                                                     <Typography variant="body1" sx={{ fontWeight: 600 }}>{selectedMember.uniqueNumber || 'N/A'}</Typography>
                                                 </Grid>
-                                                <Grid item xs={12} sm={4}>
+                                                <Grid item xs={12} sm={6}>
                                                     <Typography variant="caption" color="text.secondary">જારી તારીખ (Issue Date)</Typography>
                                                     <Typography variant="body1">{fmtDate(selectedMember.issueDate)}</Typography>
-                                                </Grid>
-                                                <Grid item xs={12} sm={4}>
-                                                    <Typography variant="caption" color="text.secondary">માન્યતા તારીખ (Valid Until)</Typography>
-                                                    <Typography variant="body1">{fmtDate(selectedMember.membershipValidUntil)}</Typography>
                                                 </Grid>
                                             </Grid>
                                         </CardContent>
@@ -450,9 +446,9 @@ export default function DeletedMembers() {
                                                             <TableCell>{fm.name}</TableCell>
                                                             <TableCell>{fm.relation || 'N/A'}</TableCell>
                                                             <TableCell>
-                                                                <Chip 
-                                                                    label={fm.gender === 'male' ? 'પુરુષ' : fm.gender === 'female' ? 'સ્ત્રી' : 'અન્ય'} 
-                                                                    size="small" 
+                                                                <Chip
+                                                                    label={fm.gender === 'male' ? 'પુરુષ' : fm.gender === 'female' ? 'સ્ત્રી' : 'અન્ય'}
+                                                                    size="small"
                                                                     color={fm.gender === 'male' ? 'primary' : fm.gender === 'female' ? 'secondary' : 'default'}
                                                                     variant="outlined"
                                                                 />
@@ -479,8 +475,8 @@ export default function DeletedMembers() {
             </Dialog>
 
             {/* --- Restore Confirmation Dialog --- */}
-            <Dialog 
-                open={restoreOpen} 
+            <Dialog
+                open={restoreOpen}
                 onClose={handleCloseRestore}
                 PaperProps={{ sx: { borderRadius: 3, p: 1, minWidth: 320 } }}
             >
@@ -490,20 +486,20 @@ export default function DeletedMembers() {
                         <DialogContentText>
                             આ સભ્યને પુનઃસ્થાપિત કરવા માટે રિક્વેસ્ટ નંબર અને કારણ દાખલ કરો.
                         </DialogContentText>
-                        <TextField 
-                            label="Request Number *" 
-                            value={restoreRequestNumber} 
-                            onChange={(e) => setRestoreRequestNumber(e.target.value)} 
-                            fullWidth 
-                            required 
+                        <TextField
+                            label="Request Number *"
+                            value={restoreRequestNumber}
+                            onChange={(e) => setRestoreRequestNumber(e.target.value)}
+                            fullWidth
+                            required
                             size="small"
                         />
-                        <TextField 
-                            label="Reason" 
-                            value={restoreReason} 
-                            onChange={(e) => setRestoreReason(e.target.value)} 
-                            fullWidth 
-                            multiline 
+                        <TextField
+                            label="Reason"
+                            value={restoreReason}
+                            onChange={(e) => setRestoreReason(e.target.value)}
+                            fullWidth
+                            multiline
                             rows={2}
                             size="small"
                         />
@@ -511,10 +507,10 @@ export default function DeletedMembers() {
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
                     <Button variant="outlined" onClick={handleCloseRestore} sx={{ borderRadius: 2 }}>Cancel</Button>
-                    <Button 
-                        variant="contained" 
-                        color="success" 
-                        onClick={handleConfirmRestore} 
+                    <Button
+                        variant="contained"
+                        color="success"
+                        onClick={handleConfirmRestore}
                         sx={{ borderRadius: 2 }}
                         disabled={!restoreRequestNumber.trim()}
                     >
@@ -524,8 +520,8 @@ export default function DeletedMembers() {
             </Dialog>
 
             {/* --- Permanent Delete Confirmation Dialog --- */}
-            <Dialog 
-                open={deleteOpen} 
+            <Dialog
+                open={deleteOpen}
                 onClose={handleCloseDelete}
                 PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
             >

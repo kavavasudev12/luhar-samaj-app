@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import {
   TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem,
   CircularProgress, Alert, IconButton, Typography, Box, Stack, Paper,
-  Stepper, Step, StepLabel, Card
+  Stepper, Step, StepLabel, Card, useTheme, useMediaQuery
 } from "@mui/material";
-import { Add, Delete } from "@mui/icons-material";
+import { Add, Delete, ArrowBack } from "@mui/icons-material";
 import api from "../services/api";
 
 const steps = ["મુખ્ય સભ્યની વિગતો (Step 1)", "પરિવારના સભ્યો (Step 2)"];
@@ -19,7 +19,9 @@ const calculateAge = (dateStr) => {
   return age;
 };
 
-export default function MemberForm({ memberToEdit, onSubmit, loading, error, existingMembers }) {
+export default function MemberForm({ memberToEdit, onSubmit, loading, error, existingMembers, onCancel }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [activeStep, setActiveStep] = useState(0);
 
   // Form Fields State
@@ -305,6 +307,17 @@ export default function MemberForm({ memberToEdit, onSubmit, loading, error, exi
 
   return (
     <Box sx={{ width: "100%" }}>
+      {/* Back Button */}
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <Button
+          startIcon={<ArrowBack />}
+          onClick={onCancel}
+          sx={{ textTransform: 'none', fontWeight: 600 }}
+        >
+          પાછળ
+        </Button>
+      </Box>
+
       {/* Stepper Header */}
       <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
         {steps.map((label) => (
@@ -317,16 +330,25 @@ export default function MemberForm({ memberToEdit, onSubmit, loading, error, exi
       {validationError && <Alert severity="error" sx={{ mb: 3 }}>{validationError}</Alert>}
       {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
-      <Paper variant="outlined" sx={{ p: 3, borderRadius: 2, mb: 3 }}>
+      <Paper 
+        variant={isMobile ? "none" : "outlined"} 
+        sx={{ 
+          p: { xs: 0, sm: 3 }, 
+          borderRadius: 2, 
+          mb: { xs: 2, sm: 3 },
+          border: isMobile ? 'none' : undefined,
+          bgcolor: 'transparent'
+        }}
+      >
         {/* STEP 1: Head Member details */}
         {activeStep === 0 && (
-          <Stack spacing={3}>
+          <Stack spacing={{ xs: 2.5, sm: 3 }}>
             <Typography variant="subtitle1" fontWeight={600} color="primary">
               મુખ્ય વ્યક્તિની માહિતી
             </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={{ xs: 1.5, sm: 2 }}>
               <Grid item xs={12}>
-                <TextField label="મુખ્ય નામ" name="headName" value={form.headName} onChange={handleChange} fullWidth required size="small" />
+                <TextField label="મુખ્ય નામ" name="headName" value={form.headName} onChange={handleChange} fullWidth required size={isMobile ? "medium" : "small"} />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField 
@@ -336,24 +358,67 @@ export default function MemberForm({ memberToEdit, onSubmit, loading, error, exi
                   onChange={(e) => setRequestNumber(e.target.value)} 
                   required 
                   fullWidth 
-                  size="small" 
+                  size={isMobile ? "medium" : "small"} 
                   helperText="આ ફેરફારને લૉગ કરવા માટે રિક્વેસ્ટ નંબર લખો."
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="સભ્ય નંબર (Unique Number)" name="uniqueNumber" value={form.uniqueNumber} onChange={handleChange} required fullWidth size="small" />
+                <TextField label="સભ્ય નંબર (Unique Number)" name="uniqueNumber" value={form.uniqueNumber} onChange={handleChange} required fullWidth size={isMobile ? "medium" : "small"} />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="રેશન નંબર" name="rationNo" value={form.rationNo} onChange={handleChange} required fullWidth size="small" />
+                <TextField label="રેશન નંબર" name="rationNo" value={form.rationNo} onChange={handleChange} required fullWidth size={isMobile ? "medium" : "small"} />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="મોબાઇલ નંબર" name="mobile" value={form.mobile} onChange={handleChange} required fullWidth size="small" />
+                <TextField label="મોબાઇલ નંબર" name="mobile" value={form.mobile} onChange={handleChange} required fullWidth size={isMobile ? "medium" : "small"} />
+              </Grid>
+
+              {/* Extra Mobile Numbers Section immediately after Primary Mobile Number */}
+              <Grid item xs={12}>
+                <Box sx={{ mt: 0.5, mb: 0.5 }}>
+                  <Typography variant="subtitle2" fontWeight={600} gutterBottom>વધારાના મોબાઇલ નંબર</Typography>
+                  <Stack spacing={1.5}>
+                    {additionalMobiles.map((m, idx) => (
+                      <Card key={idx} variant="outlined" sx={{ bgcolor: 'background.default', border: isMobile ? undefined : 'none', p: isMobile ? 1.5 : 0 }}>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <TextField 
+                            label={`મોબાઇલ ${idx + 2}`} 
+                            value={m} 
+                            onChange={(e) => handleAdditionalMobileChange(idx, e.target.value)} 
+                            fullWidth 
+                            size={isMobile ? "medium" : "small"} 
+                            type="tel" 
+                            inputProps={{ inputMode: "numeric", pattern: "[0-9]*", maxLength: 10 }} 
+                          />
+                          <IconButton 
+                            aria-label="remove" 
+                            onClick={() => removeAdditionalMobile(idx)}
+                            color="error"
+                            size={isMobile ? "medium" : "small"}
+                          >
+                            <Delete />
+                          </IconButton>
+                        </Stack>
+                      </Card>
+                    ))}
+                  </Stack>
+                  <Button 
+                    startIcon={<Add />} 
+                    onClick={addAdditionalMobile} 
+                    variant="outlined" 
+                    size={isMobile ? "medium" : "small"} 
+                    fullWidth={isMobile}
+                    sx={{ mt: 1.5 }}
+                  >
+                    મોબાઇલ ઉમેરો
+                  </Button>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField label="જારી તારીખ (Issue Date)" name="issueDate" type="date" InputLabelProps={{ shrink: true }} value={form.issueDate} onChange={handleChange} required fullWidth size={isMobile ? "medium" : "small"} />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="જારી તારીખ (Issue Date)" name="issueDate" type="date" InputLabelProps={{ shrink: true }} value={form.issueDate} onChange={handleChange} required fullWidth size="small" />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth required size="small">
+                <FormControl fullWidth required size={isMobile ? "medium" : "small"}>
                   <InputLabel id="zone-label">ઝોન પસંદ કરો</InputLabel>
                   <Select labelId="zone-label" id="zone" name="zone" value={form.zone} onChange={handleChange} disabled={loadingZones} label="ઝોન પસંદ કરો">
                     {loadingZones ? <MenuItem disabled><CircularProgress size={20} /></MenuItem> : zones.map((zone) => (<MenuItem key={zone._id} value={zone._id}>{zone.number} - {zone.name}</MenuItem>))}
@@ -361,32 +426,15 @@ export default function MemberForm({ memberToEdit, onSubmit, loading, error, exi
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
-                <TextField label="સરનામું" name="address" value={form.address} onChange={handleChange} required fullWidth size="small" multiline minRows={2} />
+                <TextField label="સરનામું" name="address" value={form.address} onChange={handleChange} required fullWidth size={isMobile ? "medium" : "small"} multiline minRows={2} />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="શહેર" name="city" value={form.city} onChange={handleChange} fullWidth size="small" />
+                <TextField label="શહેર" name="city" value={form.city} onChange={handleChange} fullWidth size={isMobile ? "medium" : "small"} />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="પિનકોડ" name="pincode" value={form.pincode} onChange={handleChange} fullWidth size="small" inputProps={{ inputMode: "numeric", pattern: "[0-9]*", maxLength: 6 }} />
+                <TextField label="પિનકોડ" name="pincode" value={form.pincode} onChange={handleChange} fullWidth size={isMobile ? "medium" : "small"} inputProps={{ inputMode: "numeric", pattern: "[0-9]*", maxLength: 6 }} />
               </Grid>
             </Grid>
-
-            <Box>
-              <Typography variant="subtitle2" fontWeight={600} gutterBottom>વધારાના મોબાઇલ નંબર</Typography>
-              {additionalMobiles.map((m, idx) => (
-                <Grid container spacing={2} alignItems="center" key={idx} sx={{ mb: 1 }}>
-                  <Grid item xs={10}>
-                    <TextField label={`મોબાઇલ ${idx + 2}`} value={m} onChange={(e) => handleAdditionalMobileChange(idx, e.target.value)} fullWidth size="small" type="tel" inputProps={{ inputMode: "numeric", pattern: "[0-9]*", maxLength: 10 }} />
-                  </Grid>
-                  <Grid item xs={2}>
-                    <IconButton aria-label="remove" onClick={() => removeAdditionalMobile(idx)}>
-                      <Delete />
-                    </IconButton>
-                  </Grid>
-                </Grid>
-              ))}
-              <Button startIcon={<Add />} onClick={addAdditionalMobile} variant="outlined" size="small" sx={{ mt: 1 }}>મોબાઇલ ઉમેરો</Button>
-            </Box>
           </Stack>
         )}
 
@@ -439,11 +487,12 @@ export default function MemberForm({ memberToEdit, onSubmit, loading, error, exi
       </Paper>
 
       {/* Stepper Navigation Buttons */}
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", flexWrap: 'wrap', gap: 1.5, mt: 2 }}>
         <Button 
           disabled={activeStep === 0 || loading} 
           onClick={handleBack}
           variant="outlined"
+          fullWidth={isMobile}
         >
           પાછા જાઓ
         </Button>
@@ -452,6 +501,7 @@ export default function MemberForm({ memberToEdit, onSubmit, loading, error, exi
             variant="contained" 
             color="primary" 
             onClick={handleNext}
+            fullWidth={isMobile}
           >
             આગળ વધો
           </Button>
@@ -461,6 +511,7 @@ export default function MemberForm({ memberToEdit, onSubmit, loading, error, exi
             color="success" 
             onClick={handleFinalSubmit}
             disabled={submitting}
+            fullWidth={isMobile}
           >
             {submitting ? "Saving..." : "સાચવો"}
           </Button>

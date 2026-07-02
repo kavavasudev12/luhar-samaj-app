@@ -1,0 +1,15 @@
+{
+  "name": "luhar-samaj-app",
+  "version": "1.0.0",
+  "description": "Welcome to the **Luhar Samaj Management System** — a premium, enterprise-grade MERN stack application customized for the administration, member directory tracking, identity card generation, and audit logging of the Samast Luhar Samaj Savarkundla community.",
+  "main": "playwright.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
+  }
+}

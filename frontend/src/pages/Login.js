@@ -54,6 +54,7 @@ const Login = () => {
             margin="normal"
             required
             fullWidth
+            type="email"
             label="Email Address"
             autoComplete="email"
             autoFocus

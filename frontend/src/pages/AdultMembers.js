@@ -14,15 +14,15 @@ export default function AdultMembers() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   // Query Filters
   const [searchTerm, setSearchTerm] = useState('');
   const [zoneFilter, setZoneFilter] = useState('');
   const [genderFilter, setGenderFilter] = useState(''); // '' for All, 'male' for Male, 'female' for Female
   const [zones, setZones] = useState([]);
 
-  const [sortBy, setSortBy] = useState('memberName');
-  const [sortOrder, setSortOrder] = useState('asc');
+  const sortBy = 'memberName';
+  const sortOrder = 'asc';
 
   // Load Zones
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function AdultMembers() {
         sortBy,
         sortOrder
       };
-      
+
       const response = await api.get('/members/adults', { params });
       setData(
         (response.data || [])
@@ -131,7 +131,7 @@ export default function AdultMembers() {
               }}
             />
           </Grid>
-          
+
           <Grid item xs={12} sm={6} md={3}>
             <FormControl fullWidth size="small">
               <InputLabel id="zone-filter-label">ઝોન ફિલ્ટર</InputLabel>
@@ -167,18 +167,18 @@ export default function AdultMembers() {
           </Grid>
 
           <Grid item xs={12} md={3} sx={{ display: 'flex', gap: 1.5, justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
-            <Button 
-              variant="contained" 
-              color="success" 
+            <Button
+              variant="contained"
+              color="success"
               startIcon={<Download />}
               onClick={handleExportExcel}
               fullWidth
             >
               Excel ડાઉનલોડ
             </Button>
-            <Button 
-              variant="outlined" 
-              color="primary" 
+            <Button
+              variant="outlined"
+              color="primary"
               startIcon={<Print />}
               onClick={handlePrint}
               fullWidth

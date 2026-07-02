@@ -78,9 +78,9 @@ test.describe('Luhar Samaj Management System E2E', () => {
     await page.waitForURL('**/dashboard');
 
     // Verify dashboard statistics are rendered
-    await expect(page.locator('text=Total Members')).toBeVisible();
-    await expect(page.locator('text=Adult Members')).toBeVisible();
-    await expect(page.locator('text=Deleted Members')).toBeVisible();
+    await expect(page.locator('text=કુલ સભ્યો').first()).toBeVisible();
+    await expect(page.locator('text=પુખ્ત સભ્યો').first()).toBeVisible();
+    await expect(page.locator('text=ડિલીટ કરેલ સભ્યો').first()).toBeVisible();
   });
 
   test('should load adults directory successfully', async ({ page }) => {

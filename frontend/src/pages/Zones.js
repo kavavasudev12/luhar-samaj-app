@@ -57,7 +57,7 @@ function Zones() {
     setDetailsData(null);
     setSelectedZoneForDetails(null);
   };
-  
+
   // ✅ **FIXED**: Sticker generation logic is now complete.
   const handleGenerateStickers = async (zone) => {
     try {

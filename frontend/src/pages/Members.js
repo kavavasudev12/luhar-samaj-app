@@ -26,13 +26,15 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
+    Stack,
+    useTheme,
+    useMediaQuery
 } from '@mui/material';
 import {
     Add,
     Search,
     Close,
     Download,
-    Description,
     Edit,
     Delete,
     ExpandMore,
@@ -43,8 +45,6 @@ import {
 import MemberForm from '../components/MemberForm';
 import {
     getMembers,
-    createMember,
-    updateMember,
 } from '../services/memberService';
 import api, { deleteMember } from '../services/api';
 
@@ -58,6 +58,8 @@ function fmtDate(d, locale = "gu-IN") {
 
 // Main Members Page Component
 export default function Members() {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [members, setMembers] = useState([]);
     const [filteredMembers, setFilteredMembers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -306,12 +308,206 @@ export default function Members() {
         setSelectedMemberId(prev => (prev === memberId ? null : memberId));
     };
 
+    const renderMobileRow = (member) => {
+        const isSelected = selectedMemberId === member._id;
+        const isGenerating = generatingPdfId === member._id;
+
+        let maleCount = 0;
+        let femaleCount = 0;
+        member.familyMembers?.forEach(fm => {
+            if (fm.gender === 'male') maleCount++;
+            if (fm.gender === 'female') femaleCount++;
+        });
+        const totalFamily = member.familyMembers?.length || 0;
+
+        return (
+            <Paper sx={{ p: 2, mb: 2, borderRadius: 2 }} elevation={1}>
+                <Stack spacing={1}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                        <Typography variant="subtitle1" fontWeight="bold">
+                            {member.head?.name}
+                        </Typography>
+                        <Typography variant="subtitle2" color="primary" fontWeight="bold">
+                            #{member.uniqueNumber || 'N/A'}
+                        </Typography>
+                    </Stack>
+                    <Typography variant="body2">
+                        <Box component="span" fontWeight="bold">મોબાઇલ:</Box> {member.mobile || 'N/A'}
+                    </Typography>
+                    <Typography variant="body2">
+                        <Box component="span" fontWeight="bold">શહેર:</Box> {member.city || 'N/A'}
+                    </Typography>
+                    <Typography variant="body2">
+                        <Box component="span" fontWeight="bold">કુલ સભ્યો:</Box> {totalFamily} (પુરુષ: {maleCount}, સ્ત્રી: {femaleCount})
+                    </Typography>
+                    
+                    <Stack direction="row" spacing={1} justifyContent="flex-end" sx={{ mt: 1 }}>
+                        <IconButton 
+                            onClick={() => handleToggleDetails(member._id)} 
+                            size="small" 
+                            title={isSelected ? "વિગતો છુપાવો" : "વિગતો જુઓ"}
+                        >
+                            {isSelected ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                        </IconButton>
+                        <IconButton 
+                            onClick={() => handlePreviewCard(member._id)} 
+                            size="small" 
+                            title="Preview PDF"
+                            disabled={isGenerating}
+                        >
+                            {isGenerating ? <CircularProgress size={14} /> : <Visibility />}
+                        </IconButton>
+                        <IconButton 
+                            onClick={() => handleDownloadCard(member)} 
+                            size="small" 
+                            title="Download PDF"
+                            disabled={isGenerating}
+                            color="primary"
+                        >
+                            {isGenerating ? <CircularProgress size={14} /> : <Download />}
+                        </IconButton>
+                        <IconButton 
+                            onClick={() => handleEditMember(member)} 
+                            size="small" 
+                            title="સુધારો કરો"
+                            color="secondary"
+                        >
+                            <Edit />
+                        </IconButton>
+                        <IconButton 
+                            onClick={() => handleDeleteMember(member._id)} 
+                            size="small" 
+                            title="કાઢી નાખો"
+                            color="error"
+                        >
+                            <Delete />
+                        </IconButton>
+                    </Stack>
+
+                    {/* Expandable Family Members Section */}
+                    <Collapse in={isSelected} timeout="auto" unmountOnExit>
+                        <Box sx={{ mt: 1.5, p: 1.5, backgroundColor: '#f9f9f9', borderRadius: 1 }}>
+                            <Typography variant="h6" gutterBottom sx={{ fontSize: '0.9rem', fontWeight: 'bold' }}>
+                                મુખ્ય વ્યક્તિની માહિતી
+                            </Typography>
+                            <Grid container spacing={1} sx={{ mb: 1.5 }}>
+                                <Grid item xs={12}>
+                                    <Typography variant="body2">
+                                        <strong>નામ:</strong> {member.head?.name}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Typography variant="body2">
+                                        <strong>સભ્ય નંબર:</strong> {member.uniqueNumber}
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+
+                            <Typography variant="h6" gutterBottom sx={{ fontSize: '0.9rem', fontWeight: 'bold' }}>
+                                સરનામું અને સંપર્ક
+                            </Typography>
+                            <Grid container spacing={1} sx={{ mb: 1.5 }}>
+                                <Grid item xs={12}>
+                                    <Typography variant="body2">
+                                        <strong>રેશન નંબર:</strong> {member.rationNo}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Typography variant="body2">
+                                        <strong>મોબાઇલ:</strong> {member.mobile || 'N/A'}
+                                    </Typography>
+                                </Grid>
+                                {member.additionalMobiles && member.additionalMobiles.length > 0 && (
+                                    <Grid item xs={12}>
+                                        <Typography variant="body2">
+                                            <strong>વધારાના મોબાઇલ:</strong> {member.additionalMobiles.join(', ')}
+                                        </Typography>
+                                    </Grid>
+                                )}
+                                <Grid item xs={12}>
+                                    <Typography variant="body2">
+                                        <strong>સરનામું:</strong> {member.address}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Typography variant="body2">
+                                        <strong>શહેર:</strong> {member.city || 'N/A'}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Typography variant="body2">
+                                        <strong>પિનકોડ:</strong> {member.pincode || 'N/A'}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Typography variant="body2">
+                                        <strong>ઝોન:</strong> {member.zone?.name || 'N/A'}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Typography variant="body2">
+                                        <strong>જારી તારીખ:</strong> {fmtDate(member.issueDate)}
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+
+                            <Typography variant="h6" gutterBottom sx={{ fontSize: '0.9rem', fontWeight: 'bold' }}>
+                                પરિવારના સભ્યો ({member.familyMembers?.length || 0})
+                            </Typography>
+                            {member.familyMembers && member.familyMembers.length > 0 ? (
+                                <Box>
+                                    {member.familyMembers.map((fm, idx) => (
+                                        <Accordion key={idx} sx={{ mb: 1 }} defaultExpanded={idx === 0}>
+                                            <AccordionSummary expandIcon={<ExpandMore />}>
+                                                <Typography variant="body2">
+                                                    {fm.name} ({fm.relation})
+                                                </Typography>
+                                            </AccordionSummary>
+                                            <AccordionDetails sx={{ backgroundColor: '#fafafa' }}>
+                                                <Grid container spacing={1}>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2">
+                                                            <strong>સબંધ:</strong> {fm.relation}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2">
+                                                            <strong>લિંગ:</strong> {fm.gender === 'male' ? 'પુરુષ' : fm.gender === 'female' ? 'સ્ત્રી' : 'અન્ય'}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2">
+                                                            <strong>જન્મતારીખ:</strong> {fmtDate(fm.birthdate)}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <Typography variant="body2">
+                                                            <strong>ઉંમર:</strong> {fm.age}
+                                                        </Typography>
+                                                    </Grid>
+                                                </Grid>
+                                            </AccordionDetails>
+                                        </Accordion>
+                                    ))}
+                                </Box>
+                            ) : (
+                                <Typography variant="body2">
+                                    કોઈ પરિવારના સભ્યો ઉમેરાયા નથી.
+                                </Typography>
+                            )}
+                        </Box>
+                    </Collapse>
+                </Stack>
+            </Paper>
+        );
+    };
+
     // Render
     return (
-        <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Container maxWidth="xl" sx={{ py: { xs: 1.5, sm: 3 } }}>
             {/* Header and Actions */}
-            <Paper sx={{ p: 2, mb: 3, borderRadius: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+            <Paper sx={{ p: { xs: 1.5, sm: 2 }, mb: { xs: 1.5, sm: 3 }, borderRadius: 3 }}>
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: { xs: 1.5, sm: 2 } }}>
                     <TextField
                         variant="outlined"
                         placeholder="સભ્યો શોધો..."
@@ -330,38 +526,47 @@ export default function Members() {
                                 </IconButton>
                             )
                         }}
-                        sx={{ minWidth: 300, flexGrow: 1 }}
+                        sx={{ minWidth: { xs: '100%', sm: 300 }, flexGrow: 1 }}
                     />
-                    <Box sx={{ display: "flex", gap: 2 }}>
-                        <Button variant="contained" color="primary" startIcon={<Add />} onClick={handleAddMember}>
+                    <Box sx={{ display: "flex", gap: { xs: 1, sm: 2 }, flexWrap: 'wrap', width: { xs: '100%', sm: 'auto' }, flexDirection: { xs: 'column', sm: 'row' } }}>
+                        <Button variant="contained" color="primary" startIcon={<Add />} onClick={handleAddMember} fullWidth={isMobile}>
                             સભ્ય ઉમેરો
                         </Button>
-                        <Button variant="outlined" color="success" startIcon={<Download />} onClick={handleExportExcel}>
+                        <Button variant="outlined" color="success" startIcon={<Download />} onClick={handleExportExcel} fullWidth={isMobile}>
                             Excelમાં નિકાસ કરો
                         </Button>
                     </Box>
                 </Box>
-                <Grid container spacing={2} sx={{ mt: 2, textAlign: 'center' }}>
-                    <Grid item xs={6} sm={3}>
-                        <Typography variant="h6">{stats.totalFamilies}</Typography>
-                        <Typography color="text.secondary">કુલ પરિવારો</Typography>
-                    </Grid>
-                    <Grid item xs={6} sm={3}>
-                        <Typography variant="h6">{stats.totalPeople}</Typography>
-                        <Typography color="text.secondary">કુલ સભ્યો</Typography>
-                    </Grid>
-                    <Grid item xs={6} sm={3}>
-                        <Typography variant="h6">{stats.maleCount}</Typography>
-                        <Typography color="text.secondary">પુરુષ</Typography>
-                    </Grid>
-                    <Grid item xs={6} sm={3}>
-                        <Typography variant="h6">{stats.femaleCount}</Typography>
-                        <Typography color="text.secondary">સ્ત્રી</Typography>
-                    </Grid>
+                <Grid container spacing={1} sx={{ mt: { xs: 1, sm: 2 }, textAlign: 'center' }}>
+                    {[
+                        { label: 'કુલ પરિવારો', value: stats.totalFamilies },
+                        { label: 'કુલ સભ્યો', value: stats.totalPeople },
+                        { label: 'પુરુષ', value: stats.maleCount },
+                        { label: 'સ્ત્રી', value: stats.femaleCount }
+                    ].map((item, idx) => (
+                        <Grid item xs={6} sm={3} key={idx}>
+                            <Paper 
+                                variant="outlined" 
+                                sx={{ 
+                                    py: { xs: 0.75, sm: 1.5 }, 
+                                    px: 1, 
+                                    borderRadius: 2, 
+                                    bgcolor: 'background.default' 
+                                }}
+                            >
+                                <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                                    {item.label}
+                                </Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: { xs: '1.1rem', sm: '1.25rem' }, mt: 0.2 }}>
+                                    {item.value}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                    ))}
                 </Grid>
             </Paper>
 
-            {/* Member Table */}
+            {/* Member List / Table */}
             {loading ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                     <CircularProgress />
@@ -372,10 +577,20 @@ export default function Members() {
                         {searchTerm ? 'કોઈ મેળ ખાતો સભ્ય મળ્યો નથી' : 'કોઈ સભ્યો ઉપલબ્ધ નથી'}
                     </Typography>
                 </Box>
+            ) : isMobile ? (
+                <Stack sx={{ maxHeight: "calc(100vh - 220px)", overflowY: "auto", mt: 1 }}>
+                    {filteredMembers
+                        .sort((a, b) => Number(a.uniqueNumber || 0) - Number(b.uniqueNumber || 0))
+                        .map((member) => (
+                            <Box key={member._id}>
+                                {renderMobileRow(member)}
+                            </Box>
+                        ))}
+                </Stack>
             ) : (
                 <Paper sx={{ borderRadius: 3, overflow: 'hidden' }}>
-                    <TableContainer>
-                        <Table stickyHeader aria-label="members table">
+                    <TableContainer component={Paper} sx={{ overflowX: 'auto', width: '100%' }}>
+                        <Table stickyHeader aria-label="members table" size="medium">
                             <TableHead>
                                 <TableRow>
                                     <TableCell sx={{ width: '10px' }} />
@@ -600,10 +815,10 @@ export default function Members() {
             )}
 
             {/* Dialogs and Snackbar */}
-            <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="md">
+            <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="md" fullScreen={isMobile}>
                 <DialogTitle>{currentMember ? 'સભ્ય સંપાદિત કરો' : 'નવો સભ્ય ઉમેરો'}</DialogTitle>
                 <DialogContent dividers>
-                    <MemberForm onSubmit={handleSubmit} memberToEdit={currentMember} loading={false} error={null} existingMembers={members} />
+                    <MemberForm onSubmit={handleSubmit} memberToEdit={currentMember} loading={false} error={null} existingMembers={members} onCancel={handleCloseDialog} />
                 </DialogContent>
             </Dialog>
             <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar(prev => ({ ...prev, open: false }))} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>

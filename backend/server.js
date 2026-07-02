@@ -4,13 +4,13 @@ require("dotenv").config({
 });
 
 console.log(
-"ENV FILE =",
-path.join(__dirname, ".env")
+  "ENV FILE =",
+  path.join(__dirname, ".env")
 );
 
 console.log(
-"MONGO_URI =",
-process.env.MONGO_URI
+  "MONGO_URI =",
+  process.env.MONGO_URI
 );
 
 
@@ -51,13 +51,19 @@ app.use(xssSanitizer);
 app.use('/api', apiLimiter);
 
 // ✅ CORS configuration
+// app.use(cors({
+//   origin: [
+//     'http://localhost:3000',
+//     'http://10.76.175.76:3000',
+//     'https://luhar-samaj-app.vercel.app',
+//     'http://192.168.1.14:5000'
+//   ],
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//   credentials: true
+// }));
+
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://10.76.175.76:3000',
-    'https://luhar-samaj-app.vercel.app'
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: true,
   credentials: true
 }));
 
@@ -128,7 +134,7 @@ app.use((err, req, res, next) => {
 // ✅ Start the server
 const PORT = process.env.PORT || 5000;
 if (require.main === module) {
-  app.listen(PORT, () => {
+  app.listen(PORT, "0.0.0.0", () => {
     console.log(`🚀 Server running on port ${PORT}`);
   });
 }

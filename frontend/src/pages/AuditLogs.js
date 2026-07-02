@@ -35,12 +35,12 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import { 
-  Search, 
-  Close, 
-  Download, 
-  Refresh, 
-  Visibility, 
+import {
+  Search,
+  Close,
+  Download,
+  Refresh,
+  Visibility,
   ArrowForward,
   Person,
   CalendarToday,
@@ -109,9 +109,9 @@ const CompactChangesDisplay = ({ changes, changesSummary }) => {
 
   return (
     <Box>
-      <Chip 
-        label={changesSummary || `${changes.length} ફેરફાર${changes.length > 1 ? 'ો' : ''}`} 
-        size="small" 
+      <Chip
+        label={changesSummary || `${changes.length} ફેરફાર${changes.length > 1 ? 'ો' : ''}`}
+        size="small"
         color="info"
         sx={{ fontWeight: 500 }}
       />
@@ -140,16 +140,16 @@ const getActionColor = (action) => {
 const AuditLogsPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  
+
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalLogs: 0 });
-  
+
   // Detail Dialog States
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedLog, setSelectedLog] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
-  
+
   // State for filters
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -186,14 +186,14 @@ const AuditLogsPage = () => {
     setFilters(prev => ({ ...prev, [name]: value }));
     setPage(0);
   };
-  
+
   const handleExport = async () => {
     try {
       const params = { search: searchTerm, ...filters };
       Object.keys(params).forEach(key => !params[key] && delete params[key]);
 
       const res = await api.get('/export/audit', { params, responseType: 'blob' });
-      
+
       const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -211,7 +211,7 @@ const AuditLogsPage = () => {
   const handleViewDetails = async (log) => {
     setDetailOpen(true);
     setSelectedLog(log);
-    
+
     // If we don't have formatted changes, fetch the full log details
     if (!log.formattedChanges) {
       setDetailLoading(true);
@@ -237,9 +237,9 @@ const AuditLogsPage = () => {
       <CardContent>
         <Stack spacing={1.5}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Chip 
-              label={log.actionGujarati || log.action} 
-              size="small" 
+            <Chip
+              label={log.actionGujarati || log.action}
+              size="small"
               color={getActionColor(log.action)}
             />
             <Typography variant="caption" color="text.secondary">
@@ -273,17 +273,17 @@ const AuditLogsPage = () => {
           <Box>
             <Typography variant="caption" color="text.secondary">ફેરફાર</Typography>
             <Box sx={{ mt: 0.5 }}>
-              <CompactChangesDisplay 
-                changes={log.formattedChanges || log.changes} 
+              <CompactChangesDisplay
+                changes={log.formattedChanges || log.changes}
                 changesSummary={log.changesSummary}
               />
             </Box>
           </Box>
 
-          <Button 
-            fullWidth 
-            variant="outlined" 
-            size="small" 
+          <Button
+            fullWidth
+            variant="outlined"
+            size="small"
             startIcon={<Visibility />}
             onClick={() => handleViewDetails(log)}
           >
@@ -297,7 +297,7 @@ const AuditLogsPage = () => {
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       <Typography variant="h5" sx={{ mb: 2, fontWeight: 600 }}>ઑડિટ લોગ્સ</Typography>
-      
+
       <Paper sx={{ p: 2, mb: 2, borderRadius: 3 }}>
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="center">
           <TextField
@@ -402,9 +402,9 @@ const AuditLogsPage = () => {
                 logs.map((log) => (
                   <TableRow key={log._id} hover>
                     <TableCell>
-                      <Chip 
-                        label={log.requestNumber || '-'} 
-                        size="small" 
+                      <Chip
+                        label={log.requestNumber || '-'}
+                        size="small"
                         variant="outlined"
                       />
                     </TableCell>
@@ -424,9 +424,9 @@ const AuditLogsPage = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Chip 
-                        label={log.actionGujarati || log.action} 
-                        size="small" 
+                      <Chip
+                        label={log.actionGujarati || log.action}
+                        size="small"
                         color={getActionColor(log.action)}
                       />
                     </TableCell>
@@ -448,14 +448,14 @@ const AuditLogsPage = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      <CompactChangesDisplay 
-                        changes={log.formattedChanges || log.changes} 
+                      <CompactChangesDisplay
+                        changes={log.formattedChanges || log.changes}
                         changesSummary={log.changesSummary}
                       />
                     </TableCell>
                     <TableCell align="center">
-                      <IconButton 
-                        size="small" 
+                      <IconButton
+                        size="small"
                         onClick={() => handleViewDetails(log)}
                         color="primary"
                       >
@@ -490,10 +490,10 @@ const AuditLogsPage = () => {
       )}
 
       {/* Detail Dialog */}
-      <Dialog 
-        open={detailOpen} 
-        onClose={handleCloseDetails} 
-        maxWidth="md" 
+      <Dialog
+        open={detailOpen}
+        onClose={handleCloseDetails}
+        maxWidth="md"
         fullWidth
         fullScreen={isMobile}
       >
@@ -541,8 +541,8 @@ const AuditLogsPage = () => {
                       <Box>
                         <Typography variant="caption" color="text.secondary">ક્રિયા</Typography>
                         <Typography variant="body2" fontWeight={500}>
-                          <Chip 
-                            label={selectedLog.actionGujarati || selectedLog.action} 
+                          <Chip
+                            label={selectedLog.actionGujarati || selectedLog.action}
                             size="small"
                             color={getActionColor(selectedLog.action)}
                           />

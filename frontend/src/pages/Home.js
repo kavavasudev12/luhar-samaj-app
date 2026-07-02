@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { People, HomeWork, Map, Campaign, ArrowForward } from "@mui/icons-material";
+import { People, HomeWork, Map, ArrowForward } from "@mui/icons-material";
 import logo from "../assets/images/stamp1.png";
 import { getPublicStats } from "../services/api";
 
@@ -54,11 +54,11 @@ export default function Home() {
       </Helmet>
 
       {/* Hero Section */}
-      <Box 
-        sx={{ 
-          mb: 8, 
-          py: 6, 
-          px: { xs: 2, sm: 4 }, 
+      <Box
+        sx={{
+          mb: 8,
+          py: 6,
+          px: { xs: 2, sm: 4 },
           borderRadius: 6,
           background: "linear-gradient(135deg, rgba(25, 118, 210, 0.05) 0%, rgba(30, 136, 229, 0.05) 100%)",
           backdropFilter: "blur(10px)",
@@ -103,10 +103,10 @@ export default function Home() {
         </Typography>
 
         {/* Action Buttons */}
-        <Stack 
-          direction={{ xs: "column", sm: "row" }} 
-          spacing={3} 
-          justifyContent="center" 
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={3}
+          justifyContent="center"
           alignItems="center"
           sx={{ mb: 2 }}
         >
@@ -165,7 +165,7 @@ export default function Home() {
         <Typography variant="h4" component="h2" sx={{ fontWeight: 700, mb: 4, color: "text.primary" }}>
           સમાજ આંકડાકીય માહિતી (Community Statistics)
         </Typography>
-        
+
         {loading ? (
           <CircularProgress />
         ) : (
@@ -176,10 +176,10 @@ export default function Home() {
               { label: "કુલ ઝોન (Total Zones)", val: stats.totalZones, icon: <Map fontSize="large" color="warning" /> },
             ].map((stat, idx) => (
               <Grid item xs={12} sm={4} key={idx}>
-                <Card 
-                  sx={{ 
-                    borderRadius: 4, 
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.05)", 
+                <Card
+                  sx={{
+                    borderRadius: 4,
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.05)",
                     border: "1px solid rgba(0,0,0,0.05)",
                     transition: "transform 0.3s",
                     "&:hover": { transform: "translateY(-5px)" }
@@ -204,13 +204,13 @@ export default function Home() {
       </Box>
 
       {/* Community Intro */}
-      <Paper 
+      <Paper
         elevation={0}
-        sx={{ 
-          p: 4, 
+        sx={{
+          p: 4,
           mb: 8,
-          borderRadius: 4, 
-          textAlign: "left", 
+          borderRadius: 4,
+          textAlign: "left",
           border: "1px solid rgba(0,0,0,0.08)",
           boxShadow: "0 8px 24px rgba(0,0,0,0.02)"
         }}
