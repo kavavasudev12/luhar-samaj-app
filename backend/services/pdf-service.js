@@ -118,14 +118,14 @@ async function generateCard(memberId) {
     doc.opacity(0.2).image(stampPath, px(310), py(250), { width: stampSize, height: stampSize }).opacity(1);
     doc.opacity(0.2).image(stampPath, px(310), py(750), { width: stampSize, height: stampSize }).opacity(1);
 
-    const baseUrl = process.env.BASE_URL || "http://localhost:5000";
-    const qrData = `${baseUrl}/api/members/verify/${member.cardId || member._id}`;
-    const qrImageBuffer = await QRCode.toBuffer(qrData, { width: 165, margin: 1 });
+    const verificationToken = member.cardId || member._id;
+    const verificationUrl = `https://luhar-gyati-samaj-sk.onrender.com/api/members/verify/${verificationToken}`;
+    const qrImageBuffer = await QRCode.toBuffer(verificationUrl, { width: 165, margin: 1 });
     const qrDrawSize = sSquare(165);
     doc.image(qrImageBuffer, px(710), py(250), { width: qrDrawSize, height: qrDrawSize });
 
-    const registrationYear = member.createdAt ? new Date(member.createdAt).getFullYear() : '';
-    doc.font('bold').fontSize(sFont(35)).fillColor('white').text(registrationYear, px(780), py(25));
+    // const registrationYear = member.createdAt ? new Date(member.createdAt).getFullYear() : '';
+    //  doc.font('bold').fontSize(sFont(35)).fillColor('white').text(registrationYear, px(780), py(25));
 
     // --- MODIFICATION START ---
     // Print Unique Number and Zone in individual, fixed-position boxes
